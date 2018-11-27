@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>我的挂单记录</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=1.1">
+    <link rel="stylesheet" type="text/css" href="css/mui.min.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+    <script type="text/javascript" src="js/mui.min.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.history.go(-1)"><div class="back"></div></div>
+		<div class="page-title">我的挂单记录</div>
+	</div>
+	<div class="container" style="background-color:#f9f9f9">
+		<div class="trade-order-title">
+			<div class="trade-order trade-order-buy trade-order-active" type="1">挂单买入</div>
+			<div class="trade-order trade-order-sell" type="2">挂单卖出</div>
+		</div>
+		<div class="digi-order-list">
+			<ul id="OA_task_1" class="mui-table-view">
+			</ul>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var access_token=localStorage.getItem("access_token");
+		if (!access_token) {
+		 	popup("您还未登录，请先登录");
+			setTimeout(function(){
+				window.location.href='login.html';
+			},1800)
+		}else{
+			var type=1;orderList(type);
+			$('.trade-order').on('click',function(){
+				$(this).siblings().removeClass('trade-order-active')
+				$(this).addClass('trade-order-active');
+				var $tradList=$(this)
+				if ($(this).hasClass('trade-order-buy')) {
+					$('.trade-buy-list').removeClass('none');
+					$('.trade-sell-list').addClass('none');
+				}else{
+					$('.trade-buy-list').addClass('none');
+					$('.trade-sell-list').removeClass('none');
+				}
+				type=$(this).attr('type');
+				orderList(type)
+			})
+		}
+		//获取列表
+		function orderList(type){
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_balance_lists";
+			var money=$("input[name='money']").val();
+			var mobile=$('#mobile').html();
+			var data={
+				access_token:access_token,
+				is_my:1,
+				type:type
+			}
+			$.post(url,data).success(function(res){
+				console.log(res)
+				var obj= $('.digi-order-list');
+				loadingStart(obj)
+				obj.html('<ul id="OA_task_1" class="mui-table-view"></ul>')
+				if (res.errno=="0") {
+					console.log('type----')
+					console.log(type)
+					if (res.data!=null) {
+						for (var i = 0; i<res.data.length;i++) {
+							var status=''
+							switch(res.data[i].status){
+								case '-1':
+								status='已取消'
+								break;
+								case '0':
+								if(type == 1){
+									status='挂买中'
+								}else{
+									status='挂卖中'
+								}
+								break;
+								case '2':
+								status='锁定中'
+								break;
+								case '3':
+								status='已完成'
+								break;
+							}
+							var order_str="";
+							order_str = `<li id="order${i}" class="mui-table-view-cell">`
+							if(res.data[i].status == '0'){
+							order_str += `<div id="a${i}" class="mui-slider-right mui-disabled">
+										                <a class="mui-btn mui-btn-red" id=${res.data[i].orderid}>删除</a>
+										        </div>`
+							}
+							order_str +=		 `<div class="mui-slider-handle">
+										          <div class="line-normal-wrapper">
+										                  <div class="line-normal-left-wrapper">
+										                          <div class="trade-bl-img-mask"><img src="${headImgurl(res.data[i].headimgurl)}"></div>
+										                          <div class="trade-bl-txt">
+										                                  <p>${res.data[i].nickname}</p>
+										                                  <p class="g-color" style="padding-top:.5em;">${ res.data[i].create_time }</p>
+										                          </div>
+										                  </div>
+										                  <div class="line-normal-right-wrapper">
+										                          <p class="o-color fs-16">${res.data[i].money}</p>
+										                          <p class="fs-14" style="margin-top: 1rem;">${status}</p>
+										                  </div>
+										          </div>
+										     </div>
+										</li>`
+							$('#OA_task_1').append(order_str)
+						};
+						loadingEnd();
+						$(document).ready(function(e) {
+						    $('#OA_task_1').on('tap', '.mui-btn', function(event) {
+						    	var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_money_del";
+								var data={ 
+									access_token:access_token,
+									orderid:event.target.id
+								}
+								$.post(url,data).success(function(res){
+									console.log(res)
+									popup('订单已取消')
+									setTimeout(function(){
+										window.location.reload()
+									},1000)
+								})
+							});
+						});
+					}else{
+						$('.digi-order-list').html('<div style="font-size:1.4rem;margin-top:2rem">暂时还没有数据</div>')
+					}
+				}else if (res.errno=="401") {
+					 popup(res.errmsg);
+					 setTimeout(function(){
+					 	window.location.href='login.html';
+					 },1800)
+				}else{
+					popup(res.errmsg);
+				}
+			});
+		}
+	</script>
+</body>
+</html>

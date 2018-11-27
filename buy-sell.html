@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=yes,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>买入</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/mui.min.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=2.1.3">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/mui.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js?v=1.101"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='index.html'"><div class="back"></div></div>
+		<div class="page-title">买入</div>
+		<div class="buysell-log fs-14 b-color" onclick="window.location.href=('register-log.html')">挂单记录</div>
+	</div>
+	<div class="container f9-bg">
+		<div class="buysell-top wh-bg">
+			<div class="purchase-list clearfix">
+				<!-- <div class="purchase-title"><span style="color: #9C9C9C">余额数量：</span></div> -->
+				<div class="purchase-title">请确认数量</div>
+				<div class="purchase-item">500</div>
+				<div class="purchase-item">1000</div>
+				<div class="purchase-item">2000</div>
+				<div class="purchase-item">3000</div>
+				<div class="purchase-item">5000</div>
+				<div class="purchase-item">8000</div>
+				<div class="purchase-item">10000</div>
+				<div class="purchase-item other">其他</div>
+			</div>
+			<div id="input" style="display: none" ></div>
+			<div style="border-bottom:1px #ccc solid;color:#9c9c9c" class="buysell-input fs-15" id="money">请输入500的整数倍金额</div>
+			<div class="purchase-btn-mask">
+				<button type="button" class="blue-btn purchase-btn">买入挂单</button>
+			</div>
+		</div>
+		<div class="buysell-list wh-bg">
+			
+		</div>
+		<div class="pay-pup">
+			<div class="pay-mask">
+				<img src="images/fork-icon.png" class="pay-close">
+				<div class="pay-title">请输入支付密码</div>
+				<ul class="mm_box">
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			    </ul>
+			    <div class="fs-15" style="text-align: right;padding:1rem 2rem 2rem 0"><a href="pw-retrieve.html?type=pay&pn=2">忘记密码?</a></div>
+				<div class="numb_box">
+					<ul class="nub_ggg">
+				      	<li><a href="javascript:void(0);">1</a></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">2</a></li>
+				      	<li><a href="javascript:void(0);">3</a></li>
+				      	<li><a href="javascript:void(0);">4</a></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">5</a></li>
+				      	<li><a href="javascript:void(0);">6</a></li>
+				      	<li><a href="javascript:void(0);">7</a></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">8</a></li>
+				      	<li><a href="javascript:void(0);">9</a></li>
+				      	<li><span></span></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">0</a></li>
+				      	<li><span  class="del" > <img src="images/jftc_18.jpg"></span></li>
+				    </ul>
+			    </div>
+			</div>
+		</div>
+		<div class="tips-box"></div>
+		<div class="result-pup">
+			<div class="result-mask">
+				<img src="images/warn.png" style="width:5rem;margin-bottom:1rem">
+				<div class="result-tip">
+					
+				</div>
+				<div class="result-btn">确定</div>
+			</div>
+			<div class="result-close"><img src="images/fork-icon.png"></div>
+		</div>
+
+	</div>
+	<script type="text/javascript">
+		localStorage.setItem('numkey',0)
+		$('#money').on('click',function(){
+			$('.other').siblings().removeClass('pur-active');
+			$('.other').addClass('pur-active');
+			$('#money').html('请输入500的整数倍金额')
+			$('#money').css('color','#9c9c9c')
+			if(this.value){
+				return
+			}
+			shoukey('#input')
+		})
+		$('.purchase-item').on('click',function(){
+			$(this).siblings().removeClass('pur-active');
+			$(this).addClass('pur-active');
+			var money=$('.pur-active').html();
+			$('#money').html(money)
+			if ($(this).hasClass('other')) {
+				$('#money').html('请输入500的整数倍金额')
+				$('#money').css('color','#9c9c9c')
+			}else{
+				$('#money').css('color','')
+				$("#input").hide()
+				$("#input").html('')
+				$('#money').show()
+				$('#money').html(money)
+			}
+			console.log($('#money').html())
+		})
+		var money=$('.pur-active').html();
+		$('#money').html(money)
+		var type=getParamString("type");
+		var access_token=localStorage.getItem("access_token");
+		let alertTitle = ''
+		let alertText = ''
+		if (type=="1") {
+			$('.page-title').html("买入");
+			$('.blue-btn').html('买入挂单');
+			alertTitle = '购买余额请直接与卖家联系'
+			title = "买入"
+			mobtext = '点击拨打卖家电话：'
+			// $('.purchase-title').html('选择买入数额');
+		}else{
+			$('.page-title').html("卖出");
+			$('.blue-btn').html('卖出挂单');
+			alertTitle = '卖出余额请直接与买家联系'
+			title = "卖出"
+			mobtext = '点击拨打买家电话：'
+			// $('.purchase-title').html('选择卖出数额')
+		}
+		if (!access_token) {
+			window.location.href='login.html';
+		}else{
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_balance_lists";
+			var data={
+				access_token:access_token,
+				is_my:0,
+				type:type == '1'?'2':'1'
+			}
+			$.post(url,data).success(function(res){
+				if(res.errno == 0){
+					let data = res.data;
+					for (let i in data) {
+						let buysell = '';
+						if(data[i].headimgurl=='null' || data[i].headimgurl==''){
+							data[i].headimgurl='images/default-head.png';
+						}
+						buysell = `<div class="buysell-bl-itme" id='${i}'>
+										<div class="buysell-bl-l">
+											<div class="buysell-img">
+												<img src='${data[i].headimgurl}'>
+											</div>
+											<div class="buysell-text">
+												<div class="buysell-name fs-16">${data[i].nickname}</div>
+												<div class="buysell-mobile fs-12">${data[i].mobile}</div>
+												<div class="buysell-pay fs-12" ><span class="buysell-bl-span">支付方式：</span>${data[i].bank_name}</div>
+											</div>
+										</div>
+										<div class="buysell-bl-r">
+											<div class="b-color fs-14 pt-1"><span class="buysell-bl-span">交易余额：</span>${data[i].money}</div>
+										</div>
+									</div>`
+						$(".buysell-list").append(buysell)
+						$("#"+i).on('click',function(){
+							alertBtn(data[i],alertTitle,title)
+						})
+					}
+				}
+			})
+			$(function(){
+				//出现浮动层
+				$(".purchase-btn").click(function(){
+					var url="http://dev.weibanker.cn/chenchangping/atc/api?url=check_money_status";
+					var data={
+						access_token:access_token,
+					}
+					$.post(url,data).success(function(res){
+						if(res.errno == 10024){
+							window.location.href='pw-retrieve.html?type=pay&pn=1'
+							return;
+						}
+						if(res.errno == 10025){
+							window.location.href='me-bank-add.html'
+							return;
+						}
+						if(res.errno != 0){
+							popup(res.errmsg)
+							return;
+						}
+						console.log($('#money').html())
+						if ($('#money').html()=="" && $('#input').html()=="") {
+							popup("请选择金额");
+							//$(".pay-pup").show();
+							//console.log(password)
+						}else if ($('#money').html() % 500 != 0 || $('#input').html() % 500 != 0 ){
+							popup("请输入500的整数倍");
+						}else{
+							$(".pay-pup").show();
+						}
+					})
+				});
+
+				function createOrder(){
+					var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_money_in";
+						var money=$('#money').html() || $('#input').html();
+						//$('#money').val(money)
+					var dType=type;
+					console.log("dType======"+dType)
+					var data={
+						access_token:access_token,
+						money:money,
+						type:dType
+					}
+					$.post(url,data).success(function(res){
+						if (res.errno=="0") {
+							window.location.href='buy-sell.html?type='+type;
+						}else if (res.errno=="401") {
+							 popup(res.errmsg);
+							 setTimeout(function(){
+							 	window.location.href='login.html';
+							 },1800)
+						}else{
+							popup(res.errmsg);
+							payClose();
+						}
+						console.log(res)
+					});
+				}
+				pay_pwd_check(access_token,createOrder)
+			});
+		}
+		function alertBtn(data,alertTitle,title){
+			let mobtype = navigator.userAgent
+			let card = data.bank_card;
+			let ruten = card.substring(3,8); //提取字符串下标之间的字符。
+        	card = card.replace(ruten,'*****')
+			let conters = `
+			<div id="alertInfo">
+				<div class="mui-popup mui-popup-in" style="background-color: #fff;">
+					<div class="mui-popup-inner">
+						<div class="mui-popup-title">${alertTitle}</div>
+						<div class="mui-popup-text">
+							<div class="alert-body fs-14">
+								<div class="alert-body-info">
+									<div>
+										<div class="alert-img"><img src="${data.headimgurl}"></div>
+										<div class="alert-name">${data.nickname}</div>
+									</div>
+									<div class="alert-info">
+										<a href="tel:${data.mobile}" class="alert-mob" style="color:#000000"><span>${mobtext}</span>${data.mobile}</a>
+										<div class="alert-bank"><span>${data.bank_name}：</span>${card}</div>
+									</div>
+								</div>
+								<div class="alert-text">请诚信交易虚假交易有被封号可能</div>
+							</div>
+						</div>
+					</div>
+					<div class="alert-text" style="padding: 1rem 0;width:90%;margin: auto;"><input placeholder="500的倍数" class="alert-input" style="width:100%"><button id="dobuysell" style="color: #fff;background: linear-gradient( #048BFC , #1169E8);width: 50%;margin-top: 1rem;">${title}</button></div>
+				</div>
+				<div id="alertbg" class="mui-popup-backdrop mui-active" style=""></div>
+			</div>`
+			$(".container").append(conters)
+			$('#alertbg').on('click',function(){
+				$("#alertInfo").remove()
+			})
+			$("#dobuysell").on('click',function(){
+				popup('功能暂未开放')
+				$("#alertInfo").remove()
+			})
+		}
+
+
+
+	</script>
+</body>
+</html>

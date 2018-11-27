@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>买卖明细</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.history.go(-1)"><div class="back"></div></div>
+		<div class="page-title">买卖明细</div>
+	</div>
+	<div class="container">
+		<div class="errno order_details" style="font-size: 100px;display: none">404</div>
+		<div class="details">
+			<div class="order_details">
+				<div class="details-item">
+					<div class="details-con b-color details-txt" style="font-size:1.8rem">买家信息</div>
+					<div style='width: 3.5rem;height: 3.5rem;float: right;'><img id="order_img" src="" style='height: 100%;width: 100%;border-radius: 50%;overflow: hidden;'></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">买家人姓名</div>
+					<div class="details-con details-info order_type" id="order_nickname"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">电话号码</div>
+					<div class="details-con details-info order_money" id="order_mobile"></div>
+				</div>
+			</div>
+		</div>
+		<div class="details" style="border-bottom: 1px solid #9c9c9c">
+			<div class="order_details">
+				<div class="details-item">
+					<div class="details-con b-color details-txt" style="font-size:1.8rem">卖家信息</div>
+					<div style='width: 3.5rem;height: 3.5rem;float: right;'><img id="payer_img" src="" style='height: 100%;width: 100%;border-radius: 50%;overflow: hidden;'></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">卖家人姓名</div>
+					<div class="details-con details-info order_type" id="payer_nickname"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">电话号码</div>
+					<div class="details-con details-info order_money" id="payer_mobile"></div>
+				</div>
+			</div>
+		</div>
+		<div class="details">
+			<div class="order_details">
+				<div class="details-item">
+					<div class="details-con details-txt">订单状态</div>
+					<div class="details-con details-info order_people" id="order_success"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">交易额</div>
+					<div class="details-con details-info b-color order_people" style="font-size:1.5rem" id="order_money"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">预估价值</div>
+					<div class="details-con details-info b-color order_people" style="font-size:1.5rem" id="payer_money"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">挂单单号</div>
+					<div class="details-con details-info order_status" id="order_source"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">交易单号</div>
+					<div class="details-con details-info order_status" id="payer_source"></div>
+				</div>
+			</div>
+		</div>
+		<div style="border: 1px solid;width: 93%;height: 4rem;line-height: 4rem ;font-size: 1.8rem;margin:auto;margin-top: 2rem;display: none" class="b-color" id="success"></div>
+	</div>
+	<script type="text/javascript">
+			var access_token=localStorage.getItem("access_token");
+			var orderid=getParamString("orderid");
+			$(function(){
+				var types = getParamString("types")
+				var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_balance_info";
+				var data={
+					access_token:access_token,
+					orderid:orderid
+				}
+				//获取信息
+				$.post(url,data).success(function(res){
+					if (res.errno==="0") {
+						$('#order_nickname').html(res.data[0].buyer_infp.nickname);
+						$('#order_mobile').html(res.data[0].buyer_infp.mobile);
+						$('#order_img').attr('src',headImgurl(res.data[0].buyer_infp.headimgurl));
+						$('#order_money').html(res.data[0].money);
+						$('#order_success').html(status(res.data[0].status,types));
+						$('#payer_nickname').html(res.data[0].seller_infp.nickname);
+						$('#payer_mobile').html(res.data[0].seller_infp.mobile);
+						$('#payer_img').attr('src',headImgurl(res.data[0].seller_infp.headimgurl));
+						$('#payer_money').html('￥'+(res.data[0].money *0.85));
+						$('#payer_success').html(status(res.data[0].status,types));
+						$('#order_source').html(res.data[0].orderid);
+						$('#payer_source').html(res.data[0].source);
+						successClick(types)
+					}else if (res.errno=="401") {
+						 popup(res.errmsg);
+						 setTimeout(function(){
+						 	window.location.href='login.html';
+						 },1800)
+					}else{
+						popup(res.errmsg);
+						$(".errno").show()
+					}
+				});
+			})
+ 
+ 
+		function status(success,types){
+			if(types == 11){
+				switch(success){
+					case '0':
+						$("#success").html('买家确认')
+						$("#success").show()
+						return '等待买家确认付款'
+					break;
+					case '1':
+						$("#success").hide()
+						return '买家已付款，等待卖家确认'
+					break;
+					case '2':
+						$("#success").hide()
+						return '卖家确认超时 订单锁定'
+					break;
+				}
+			}else if(types == 21){
+				switch(success){
+					case '0':
+						$("#success").hide()
+						return '等待买家确认付款'
+					break;
+					case '1':
+						$("#success").html('卖家确认')
+						$("#success").show()
+						return '买家已付款，等待卖家确认'
+					break;
+					case '2':
+						$("#success").hide()
+						return '卖家确认超时 订单锁定'
+					break;
+				}
+			} else{
+				$("#success").hide()
+				return '订单完成'
+			}
+			
+		}
+		//提交确认
+		function successClick(types){
+			$("#success").on('click',function(){
+				var url=''
+				if(types == 11){
+					url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_buyer_success";
+				}
+				if(types == 21){
+					url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_seller_success";
+				}
+				var data={
+					access_token:access_token,
+					orderid:orderid
+				}
+				//获取信息
+				$.post(url,data).success(function(res){
+					console.log(res)
+					if (res.errno==="0") {
+						popup('交易成功')
+						setTimeout(function(){
+							window.location.href='pay-log.html'
+						},1500)
+					}else if (res.errno=="401") {
+						 popup(res.errmsg);
+						 setTimeout(function(){
+						 	window.location.href='login.html';
+						 },1800)
+					}else{
+						popup(res.errmsg);
+						$(".errno").show()
+					}
+				});
+			})
+		}
+	</script>
+</body>
+</html>

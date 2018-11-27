@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<!-- 是否启用 WebApp 全屏模式 -->
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<!-- 设置状态栏的背景颜色 -->
+		<meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0" />
+		<meta name="format-detection" content="telephone=no,email=no" />
+		<!-- 禁止数字识自动别为电话号码 -->
+		<!-- 不让android识别邮箱 -->
+		<title>个人中心</title>
+		<link rel="stylesheet" type="text/css" href="css/common.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css?v-1.5">
+		<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="js/resize.js"></script>
+		<script type="text/javascript" src="js/common.js"></script>
+	</head>
+
+	<body>
+		<div class="page-top">
+			<div class="back-btn" onclick="window.location.href='index.html'">
+				<div class="back"></div>
+			</div>
+			<div class="page-title">个人中心</div>
+		</div>
+		<div class="container" style="background-color:#f9f9f9">
+			<div class="me-top">
+				<a href="me-info.html" class="me-user">
+					<div class="me-user-img" id='userimg'><img class="imgBR" id="headimgurl" src="" /></div>
+					<div class="me-user-info">
+						<div class="me-user-name fs-18">昵称 : <span id='nickname'></span></div>
+						<div class="me-user-code">推荐码：<span id='share'></span></div>
+					</div>
+					<div class='me-user-vip'></div>
+				</a>
+			</div>
+			<div class="me-list">
+				<a href="javascript:void(0)" class="me-list-item" id="me-assets">
+					<img src="images/me-icon-2.png" class="me-l-icon">
+					<div class="me-l-left">
+						<span class="me-l-txt">我的资产</span>
+						<div class="arrow-right"></div>
+					</div>
+				</a>
+				<!--<a href="me-info.html" class="me-list-item">
+				<div class="me-l-left">
+					<img src="images/me-icon-1.png" class="me-l-icon">
+					<span class="me-l-txt">个人资料</span>
+				</div>
+				<div class="arrow-right"></div>
+			</a>-->
+				<a href="Lv1-downLine.html" class="me-list-item">
+					<img src="images/me-icon-2.png" class="me-l-icon">
+					<div class="me-l-left">
+						<span class="me-l-txt">我的直接分享会员</span>
+					</div>
+					<div class="arrow-right"></div>
+				</a>
+				<a href="me-bank.html" class="me-list-item">
+					<img src="images/me-icon-3.png" class="me-l-icon">
+					<div class="me-l-left">
+						<span class="me-l-txt">银行卡</span>
+					</div>
+					<div class="arrow-right"></div>
+				</a>
+				<a href="me-pw.html" class="me-list-item">
+					<img src="images/me-icon-4.png" class="me-l-icon">
+					<div class="me-l-left">
+						<span class="me-l-txt">修改密码</span>
+					</div>
+					<div class="arrow-right"></div>
+				</a>
+				<a href="me-news.html" class="me-list-item">
+					<img src="images/me-icon-5.png" class="me-l-icon">
+					<div class="me-l-left" style="border-bottom:none">
+						<span class="me-l-txt">公告</span>
+					</div>
+					<div class="arrow-right"></div>
+				</a>
+				<a href="https://www.aitechain12345.com/merchant/" class="me-list-item mt14">
+					<img src="images/me-icon-6.png" class="me-l-icon">
+					<div class="me-l-left">
+						<span class="me-l-txt">我的店铺</span>
+					</div>
+					<div class="arrow-right"></div>
+				</a>
+<!-- 				<a href="https://www.aitechain12345.com/ebay/About/order.html" class="me-list-item">
+ -->			<a href="https://www.aitechain12345.com/ebay/About/order.html" class="me-list-item">
+					<img src="images/me-icon-7.png" class="me-l-icon">
+					<div class="me-l-left">
+						<span class="me-l-txt">我的订单</span>
+					</div>
+					<div class="arrow-right"></div>
+				</a>
+<!-- 				<a href="https://www.aitechain12345.com/ebay/order/address.html" class="me-list-item">
+ -->			<a href="https://www.aitechain12345.com/ebay/order/address.html" class="me-list-item">
+					<img src="images/me-icon-8.png" class="me-l-icon">
+					<div class="me-l-left" style="border-bottom:none">
+						<span class="me-l-txt">地址管理</span>
+					</div>
+					<div class="arrow-right"></div>
+				</a>
+				<a href='javascript:void(0)' class="me-list-item mt14" id="me-share">
+					<img src="images/me-icon-9.png" class="me-l-icon">
+					<div class="me-l-left">
+						<span class="me-l-txt">分享</span>
+					</div>
+					<div class="arrow-right"></div>
+				</a>
+				<a href="javascript:void(0)" class="me-list-item" id="me-about">
+					<img src="images/me-icon-10.png" class="me-l-icon">
+					<div class="me-l-left" style="border-bottom:none">
+						<span class="me-l-txt">关于我们</span>
+					</div>
+					<div class="arrow-right"></div>
+				</a>
+				<a href="javascript:void(0)" class="me-exit">
+					<div class="">
+						<span class="me-l-txt">退出登录</span>
+					</div>
+				</a>
+			</div>
+		</div>
+		<script type="text/javascript">
+			// var nickname=getParamString("nickname");
+			// var share=getParamString("share");
+			// $('#nickname').html(nickname);
+			// $('#share').html(share);
+
+			// var url=document.referrer;
+			// console.log(url)
+			// if (document.referrer === '') {
+			//     // 没有来源页面信息的时候，改成首页URL地址
+			//     $('.top_back_box>a').on('click',function(){
+			//         window.location.reload();
+			//     })
+			// }else{
+			//     $('.top_back_box>a').on('click',function(){
+			//         window.location.href=url;
+			//     })
+			// }
+
+			var access_token = localStorage.getItem("access_token");
+			if(!access_token) {
+				window.location.href = "login.html";
+			} else {
+				var url = "http://dev.weibanker.cn/chenchangping/atc/api?url=get_member_info";
+				var data = {
+					access_token: access_token
+				}
+				$.post(url, data).success(function(res) {
+					console.log(res)
+					if(res.errno === "0") {
+						// banner(res);
+						// userinfo(res)
+						$('#nickname').html(res.data.nickname);
+						$('#share').html(res.data.share);
+						if(res.data.level === "1") {
+							$('.me-user-vip').html('<img src="" />')
+						}
+						if(res.data.level === "2") {
+							$('.me-user-vip').html("<img src='images/me-vip.png'/>")
+						}
+						if(res.data.level === "3") {
+							$('.me-user-vip').html('普通会员')
+						}
+						if(res.data.headimgurl == "") {
+							$('#headimgurl').attr('src', 'images/default-head.png')
+						} else {
+							$('#headimgurl').attr('src', res.data.headimgurl)
+						}
+						$('#share_code').html(res.data.share);
+						localStorage.setItem("title", '关于我们')
+						$("#me-about").attr('href', res.data.about);
+						$('#me-share').attr('href', 'me-share.html?share=' + res.data.share);
+						$('#me-assets').attr('href', 'me-assets.html?money=' + res.data.money + '&coin=' + res.data.coin + '&money2coin=' + res.data.money2coin + '&score=' + res.data.score);
+					} else if(res.errno == "401") {
+						popup(res.errmsg);
+						setTimeout(function() {
+							localStorage.removeItem("access_token");
+							window.location.href = 'login.html';
+						}, 1800)
+					} else {
+						popup("登录出错，请重新登录");
+						setTimeout(function() {
+							localStorage.removeItem("access_token");
+							window.location.href = 'login.html';
+						}, 1800)
+					}
+				});
+				var url = "http://dev.weibanker.cn/chenchangping/atc/api?url=member_line_count";
+				var data = {
+					access_token: access_token
+				}
+				$.post(url, data).success(function(res) {
+					if(res.errno === "0") {
+						console.log(res)
+						$('#friend_level1').html(res.data);
+					} else {
+						$('#friend_level1').html("0");
+					}
+				});
+				$('.me-exit').on('click', function() {
+					localStorage.removeItem("access_token");
+					window.location.href = 'login.html';
+				})
+			}
+		</script>
+	</body>
+
+</html>

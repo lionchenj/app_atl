@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<!-- 是否启用 WebApp 全屏模式 -->
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<!-- 设置状态栏的背景颜色 -->
+		<meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0" />
+		<meta name="format-detection" content="telephone=no,email=no" />
+		<!-- 禁止数字识自动别为电话号码 -->
+		<!-- 不让android识别邮箱 -->
+		<title>艾特币</title>
+		<link rel="stylesheet" type="text/css" href="css/common.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css?v-1.0">
+		<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="js/resize.js"></script>
+		<script type="text/javascript" src="js/echarts.simple.min.js"></script>
+		<script type="text/javascript" src="js/common.js"></script>
+	</head>
+
+	<body>
+		<div class="page-top">
+			<div class="back-btn" onclick="window.location.href='index.html'">
+				<div class="back"></div>
+			</div>
+			<div class="page-title">艾特币</div>
+		</div>
+		<div class="container" style="background-color:#f9f9f9">
+			<div class="trade-top clearfix">
+				<a href="digital-roll.html?type=2" class="trade-top-item trade-top-item1">
+					<div class="trade-t-img">
+						<img src="images/tr-icon-1.png">
+					</div>
+					<p style="padding:1rem 0">发布出售订单</p>
+				</a>
+				<a href="digital-roll.html?type=1" class="trade-top-item trade-top-item2">
+					<div class="trade-t-img">
+						<img src="images/tr-icon-2.png">
+					</div>
+					<p style="padding:1rem 0">发布购买订单</p>
+				</a>
+				<a href="digital-order.html" class="trade-top-item trade-top-item3">
+					<div class="trade-t-img">
+						<img src="images/tr-icon-3.png">
+					</div>
+					<p style="padding:1rem 0">我的挂单</p>
+				</a>
+				<a href="trade-record.html?trade=2" class="trade-top-item trade-top-item4">
+					<div class="trade-t-img">
+						<img src="images/tr-icon-4.png">
+					</div>
+					<p style="padding:1rem 0">交易记录</p>
+				</a>
+			</div>
+			<div class="trade-middle">
+				<div id='canvasDiv' style="width: 100%;height: 250px;"></div>
+			</div>
+			<div class="trade-bottom">
+				<div class="trade-b-title">
+					<div class="trade-bt trade-bt-buy" type="2">
+						<div class="trade trade-bt-active">购买</div>
+					</div>
+					<div class="trade-bt trade-bt-sell" type="1">
+						<div class="trade">出售</div>
+					</div>
+				</div>
+				<div class="trade-b-list" style="width: 100%">
+
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="js/ichart.1.2.1.min.js"></script>
+		<script type="text/javascript">
+			var access_token = localStorage.getItem("access_token");
+			if(!access_token) {
+				popup("您还未登录，请先登录");
+				setTimeout(function() {
+					window.location.href = 'login.html';
+				}, 1800)
+			} else {
+				var url = "http://dev.weibanker.cn/chenchangping/atc/api?url=page_coin_money_list";
+				var data = {
+					access_token: access_token
+				}
+				$.post(url, data).success(function(res) {
+					//console.log(res);
+					if(res.errno == "0") {
+						chart(res)
+					} else if(res.errno == "401") {
+						popup(res.errmsg);
+						setTimeout(function() {
+							localStorage.removeItem("access_token");
+							window.location.href = 'login.html';
+						}, 1800)
+					} else {
+						popup(res.errmsg);
+					}
+				});
+				var type = 2;
+				orderList(type);
+				$('.trade-bt').on('click', function() {
+					$('.trade').removeClass('trade-bt-active')
+					$(this).find('.trade').addClass('trade-bt-active');
+					var $tradList = $(this)
+					if($(this).hasClass('trade-bt-buy')) {
+						$('.trade-buy-list').removeClass('none');
+						$('.trade-sell-list').addClass('none');
+					} else {
+						$('.trade-buy-list').addClass('none');
+						$('.trade-sell-list').removeClass('none');
+					}
+					type = $(this).attr('type');
+					orderList(type)
+				})
+			}
+
+			function orderList(type) {
+				var url = "http://dev.weibanker.cn/chenchangping/atc/api?url=page_coin_order";
+				var money = $("input[name='money']").val();
+				var mobile = $('#mobile').html();
+				var data = {
+					access_token: access_token,
+					is_my: 0,
+					type: type
+				}
+				var order_str = "";
+				$.post(url, data).success(function(res) {
+					var obj = $('.trade-b-list');
+					loadingStart(obj)
+					if(res.errno == "0") {
+						if(res.data != null) {
+							for(var i = 0; i < res.data.length; i++) {
+								if(type == 1) {
+									order_str += '<div class="trade-bl-itme">' +
+										'<div class="trade-bl-l clearfix">' +
+										'<div><span class="trade-bl-span">委托编号：</span>' + res.data[i].orderid + '</div>' +
+										'<div style="padding-top:.5em;"><span class="trade-bl-span">当前数量：</span>' + res.data[i].num + '</div>' +
+										'<div style="padding-top:.5em;"><span class="trade-bl-span">当前价值：</span>' + res.data[i].z_money + '</div>' +
+										'</div>' +
+										'<div class="trade-bl-r">' +
+										'<div class="o-color fs-18">¥' + res.data[i].money + '</div>' +
+										'<div class="">实际金额</div>' +
+										'</div>' +
+										'<div style="width: 20%;">' +
+										'<button type="button" class="buy-btn" orderid="' + res.data[i].orderid + '" aite_type="1" coinNum="' + res.data[i].num + '">出售</button>' +
+										'</div>' +
+										'</div>';
+								} else {
+									order_str += '<div class="trade-bl-itme">' +
+										'<div class="trade-bl-l clearfix">' +
+										'<div><span class="trade-bl-span">委托编号：</span>' + res.data[i].orderid + '</div>' +
+										'<div style="padding-top:.5em;"><span class="trade-bl-span">当前数量：</span>' + res.data[i].num + '</div>' +
+										'<div style="padding-top:.5em;"><span class="trade-bl-span">当前价值：</span>' + res.data[i].z_money + '</div>' +
+										'</div>' +
+										'<div class="trade-bl-r">' +
+										'<div class="o-color fs-18">¥' + res.data[i].money + '</div>' +
+										'<div class="">实际金额</div>' +
+										'</div>' +
+										'<div style="width: 20%;">' +
+										'<button type="button" class="buy-btn" orderid="' + res.data[i].orderid + '" aite_type="1" coinNum="' + res.data[i].num + '">购买</button>' +
+										'</div>' +
+										'</div>';
+								}
+							};
+							loadingEnd();
+							$('.trade-b-list').html(order_str);
+							$('.buy-btn').on('click', function() {
+								var orderid = $(this).attr('orderid');
+								var type = $(this).attr('aite_type');
+								var coinNum = $(this).attr('coinNum');
+								var link = 'aite-roll.html?type=' + type + '&orderid=' + orderid + '&coinNum=' + coinNum;
+								window.location.href = link;
+							})
+						} else {
+							$('.trade-b-list').html('<div style="font-size:1.4rem;margin-top:2rem">暂时还没有数据</div>');
+						}
+					} else if(res.errno == "401") {
+						popup(res.errmsg);
+						setTimeout(function() {
+							window.location.href = 'login.html';
+						}, 1800)
+					} else {
+						popup(res.errmsg);
+					}
+				});
+			}
+
+			//折线图
+			$(function() {
+
+			});
+
+			function chart(res) {
+				var ww = document.body.clientWidth;
+				var ww2 = ww * 0.8;
+				if(ww < 375) {
+					ww2 = ww * 0.77;
+				};
+				//console.log(ww2);
+				var flow = [];
+				for(var i = 0; i < res.data.length; i++) {
+					flow.push(res.data[i].money);
+				}
+				var flows = flow;
+				let ymax = 10
+				for(let i=0;i<flows.length;i++){
+					for(let j=i+1;j<flows.length;j++){
+						if(flows[j]>flows[i]){
+							ymax=flows[i];
+							flows[i]=flows[j];
+							flows[j]=ymax; 
+						}
+					}
+				}
+				if(flows[0] > 10){
+					ymax = flows[0]*1+5
+				}
+				//var flow=[500,1000,200,1500,2000,500];
+				//console.log(flow)
+				var data = [{
+					name: 'PV',
+					value: flow,
+					color: '#ffffff',
+					line_width: 2
+				}];
+				var labels = [];
+				for(var i = 0; i < res.data.length; i++) {
+					labels.push(res.data[i].month + "-" + res.data[i].day);
+				}
+				
+				var myChart = echarts.init(document.getElementById('canvasDiv'));
+				// 指定图表的配置项和数据
+				var option = {
+					grid: {
+						borderWidth: '0',
+						y: 30,
+						x2: 5,
+					},
+					xAxis: [{
+						type: 'category',
+						data: labels,
+						axisLine: {
+							show: false
+						},
+						axisLabel: {
+							color: "#1169E8",
+							lineStyle: {
+								color: "#FFF"
+							}
+						},
+						axisTick: {
+							length: 5,
+							alignWithLabel: true,
+							lineStyle: {
+								color: '#FFF'
+							}
+						}
+					}],
+					yAxis: [{
+						min:1 ,
+						max: ymax,
+						type: 'value',
+						axisLine: {
+							show: false
+						},
+						axisLabel: {
+							color: "#FFF"
+						},
+						splitLine: {
+							lineStyle: {
+								color: '#0f4fa8'
+							}
+						},
+						axisLine: {
+							show: false
+						},
+						axisTick: {
+							length: 5,
+							lineStyle: {
+								color: '#fff'
+							}
+						}
+					}],
+					series: [{
+						symbol: 'circle', //拐点样式
+						symbolSize: 8, //拐点大小
+						itemStyle: {
+							normal: {
+								lineStyle: {
+									color: '#FFF',
+									width: 1
+								},
+								borderColor: '#FFF',
+								color: '#FFF'
+
+							}
+						},
+						data: flow,
+						type: 'line'
+					}]
+				};
+				myChart.setOption(option);
+				//			var chart = new iChart.LineBasic2D({
+				//				render : 'canvasDiv',
+				//				data: data,
+				//				align:'center',
+				//				width : ww,
+				//				height : 250,
+				//				shadow:true,
+				//				shadow_color : '#4caefb',
+				//				shadow_blur : 8,
+				//				shadow_offsetx : 0,
+				//				shadow_offsety : 0,
+				//				background_color:'#4caefb',
+				//				coordinate:{
+				//					width:ww2,
+				//					height:200,
+				//					striped_factor : 0.18,
+				//					grid_color:'#cccccc',
+				//					axis:{
+				//						color:'#ffffff',
+				//						width:[0,0,2,2]
+				//					},
+				//					scale:[{
+				//						 position:'left',
+				//						 start_scale:0,
+				//						 end_scale:40,
+				//						 scale_space:10,
+				//						 scale_size:2,
+				//						 scale_enable : false,
+				//						 label : {color:'#ffffff',font : '微软雅黑',fontsize:11,fontweight:600},
+				//						 scale_color:'#ffffff'
+				//					},{
+				//						 position:'bottom',
+				//						 label : {color:'#ffffff',font : '微软雅黑',fontsize:11,fontweight:600},
+				//						 scale_enable : false,
+				//						 labels:labels
+				//					}]
+				//				}
+				//			});
+				//			//开始画图
+				//			chart.draw();
+			}
+		</script>
+	</body>
+
+</html>

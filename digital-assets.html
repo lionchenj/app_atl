@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>数字资产</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="js/clipboard.min.js"></script>
+
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='index.html'"><div class="back"></div></div>
+		<div class="page-title">数字资产</div>
+		<div class="page-right"><a href="trade-record.html?trade=1" class="tr-record">交易记录</a></div>
+	</div>
+	<div class="container" style="background-color:#f9f9f9">
+		<div class="digital-top">
+			<a href="trade.html" style="display: inline-block">
+				<img src="images/default-head.png" style="width: 6.6rem;">
+				<div class="fs-14" style="margin-top: 1rem;">当前价格:<span id="money">0</span></div>
+			</a>
+		</div>
+		<div class="digital-bottom">
+			<div class="digital-b-item">
+				<div class="digital-b-l">艾特币</div>
+				<div class="digital-b-r" id="coin">0</div>
+			</div>
+			<div class="digital-b-item-mask">
+				<div class="digital-b-item">
+					<div class="digital-b-l">钱包地址</div>
+					<div class="digital-b-r" id="sign">0</div>
+				</div>
+				<button class="copy-btn" data-clipboard-text="888888888@qq.com">复制地址</button>
+			</div>
+		</div>
+		<div class="tips-box"></div>
+	</div>
+	<script type="text/javascript">
+		var clipboard = new Clipboard('.copy-btn');
+	    clipboard.on('success', function(e) {
+	        popup("复制成功");
+	    });
+	    clipboard.on('error', function(e) {
+	       popup("复制失败，请手动复制");
+	    });
+		var access_token=localStorage.getItem("access_token");
+		if (!access_token) {
+			window.location.href="login.html";
+		}else{
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_coin_index";
+			var data={
+				access_token:access_token
+			}
+			$.post(url,data).success(function(res){
+				if (res.errno=="0") {
+					$('#coin').html(res.data.coin);
+					$('#money').html(res.data.money)
+					$('#sign').html(res.data.sign);
+					$('.copy-btn').attr('data-clipboard-text',res.data.sign)
+					localStorage.setItem("rate",res.data.money);
+					// popup(res.errmsg);
+					// window.location.href='balance.html';
+				}else if (res.errno=="401") {
+					 popup(res.errmsg);
+					 setTimeout(function(){
+					 	window.location.href='login.html';
+					 },1800)
+				}else{
+					popup(res.errmsg);
+				}
+				console.log(res)
+			});
+		}
+
+
+
+	</script>
+</body>
+</html>

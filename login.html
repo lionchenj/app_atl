@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>登录</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=2.0">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+
+	<div class="container login_bg" style="padding:0">
+<!-- 		<div class="login-title">
+			账号登录
+		</div> -->
+		<div class="login-wrap">
+			<form class="login">
+				<div class="login-title">登录ATC</div>
+				<div class="login-item">
+					<input type="tel" name="phone" placeholder="手机号码" class="login-input" value="">
+				</div>
+				<div class="login-item">
+					<input type="password" name="password" placeholder="登录密码" class="login-input" value="">
+				</div>
+				<button type="button" class="login-btn fs-15">提交</button>
+				<div class="login-tip relative fs-12" style="padding-top:1rem;">
+					<a href="pw-retrieve.html?type=login&pn=3" style="left:0;color:#FFF;" class="absolute">忘记密码?</a><a href="register.html" style="right:0;color:#FFF" class="absolute">立即注册</a>
+				</div>
+			</form>
+		</div>
+
+		<div class="tips-box"></div>
+	</div>
+	<script type="text/javascript">
+
+		$(function(){
+			localStorage.removeItem('access_token')
+			localStorage.removeItem('mobile')
+			$(".login-btn").on("click",function(){
+				var phone = $("input[name='phone']").val();
+				var password=$("input[name='password']").val();
+				if(!phone || new RegExp(/^\s*$/).test(phone)){
+					popup("手机号码不能为空");
+					return false;
+				}else if(!new RegExp(/^(13[0-9]|14[5|7|9]|15[0|1|2|3|5|6|7|8|9]|17[0-9]|18[0-9])\d{8}$/).test(phone)){
+					popup("请输入正确的手机号码")
+					return false;
+				}else if(!password){
+					popup("密码不能为空");
+					return false;
+				}else{
+					login(phone,password);
+				}
+			})
+		})
+		function login(phone,password){
+			console.log(141)
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=auth";
+			var data={
+				mobile:phone,
+				password:password
+			}
+			$.post(url,data).success(function(res){
+				// console.log(res);
+				if (res.errno=="0") {
+					popup('登录成功');
+					var access_token = res.data.access_token;
+					console.log(access_token)
+					localStorage.setItem("access_token",access_token);
+					localStorage.setItem("mobile",phone);
+					window.location.href='index.html'
+				}else{
+					popup(res.errmsg);
+				}
+			});
+		}
+	</script>
+</body>
+</html>

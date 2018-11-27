@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>编辑昵称</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='me-info.html'"><div class="back"></div></div>
+		<div class="page-title">编辑昵称</div>
+	</div>
+	<div class="container">
+		<div class="edit-tiem">
+			<input type="text" name='username' placeholder="请输入你的昵称" value="" class="edit-input" />
+		</div>
+		<div class="blue-btn-mask">
+			<button type="button" class="blue-btn preservation-btn">保存</button>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var access_token=localStorage.getItem("access_token");
+		if (!access_token) {
+			$(document).click(function() {
+				window.location.href="login.html";
+			});
+		}else{
+			$('.preservation-btn').on('click',function(){
+				var nickname = $('.edit-input').val();
+				changeInfo(access_token,nickname);
+				//window.location.href='me-info.html';
+			});
+			function changeInfo(access_token,nickname){
+				var url="http://dev.weibanker.cn/chenchangping/atc/api?url=member_update";
+				var data={
+					access_token:access_token,
+					nickname:nickname
+
+				}
+				$.post(url,data).success(function(res){
+					if (res.errno==="0") {
+						console.log(res)
+						popup('修改成功');
+						window.location.href='me-info.html';
+					}else if (res.errno=="401") {
+						popup(res.errmsg);
+						setTimeout(function(){
+							window.location.href='login.html';
+						},1800)
+					}else{
+						popup(res.errmsg);
+					}
+				});
+			}
+		}
+	</script>
+</body>
+</html>

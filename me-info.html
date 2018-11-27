@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>个人资料修改</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='me.html'"><div class="back"></div></div>
+		<div class="page-title">个人资料</div>
+	</div>
+	<div class="container">
+		<div class="me-info-list">
+			<a href="upload-head.html" class="me-info-item" style="width: 100%;height: 8rem;">
+				<div class="me-info-l fs-14" style="line-height: 8rem;">更换头像</div>
+				<div class="me-info-r" style="line-height: 8rem;">
+					<img src="" id="headimgurl" class="me-info-head">
+					<div class="arrow-right"></div>
+				</div>
+			</a>
+			<a href="edit-name.html" class="me-info-item" style="width: 100%;height: 4.7rem;">
+				<div class="me-info-l fs-14" style="line-height: 4.7rem;">昵称</div>
+				<div class="me-info-r" style="line-height: 4.7rem;">
+					<span class="me-info-txt" id="nickname"></span>
+					<div class="arrow-right"></div>
+				</div>
+			</a>
+			<a href="edit-introduce.html" class="me-info-item" style="width: 100%;height: 4.7rem;">
+				<div class="me-info-l fs-14" style="line-height: 4.7rem;">个人介绍</div>
+				<div class="me-info-r" style="line-height: 4.7rem;width:60%;">
+					<span class="me-info-txt" style="width:100%;overflow: hidden;display:inline-block;height:4.7rem;text-align:right;padding-right:5rem" id="description">还是空的,快来介绍一下你自己吧</span>
+					<div class="arrow-right"></div>
+				</div>
+			</a>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var access_token=localStorage.getItem("access_token");
+		if (!access_token) {
+			$(document).click(function() {
+				window.location.href="login.html";
+			});
+		}else{
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=get_member_info";
+			var data={
+				access_token:access_token
+			}
+			$.post(url,data).success(function(res){
+
+				if (res.errno==="0") {
+					// banner(res);
+					console.log(res)
+						console.log(777)
+					$('#nickname').html(res.data.nickname);
+					$('#description').html(res.data.description);
+					if (res.data.headimgurl=="") {
+						$('#headimgurl').attr('src','images/default-head.png')
+					}else{
+						$('#headimgurl').attr('src',res.data.headimgurl)
+					}
+				}else if (res.errno=="401") {
+				 		popup(res.errmsg);
+						setTimeout(function(){
+							localStorage.removeItem("access_token");
+							window.location.href='login.html';
+						},1800)
+				}else{
+					popup("登录出错，请重新登录");
+					setTimeout(function(){
+						localStorage.removeItem("access_token");
+						window.location.href='login.html';
+					},1800)
+				}
+			});
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>注册</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=2.0">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<!--<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='login.html'">
+			<div class="back"></div>
+		</div>
+		<div class="page-title">注册</div>
+	</div>-->
+	<div class="container login_bg" style="padding:0">
+		<div class="login-wrap">
+			<div class="login-title">注册ATC</div>
+			<div class="login">
+				<div class="login-item">
+					<input type="tel" name="phone" placeholder="手机号" class="login-input" value="">
+				</div>
+				<div class="login-item">
+					<input type="tel" name="code" placeholder="验证码" class="login-input" value="">
+					<button type="button" class="get-code" id="get-code">获取验证码</button>
+				</div>
+				<div class="login-item">
+					<input type="password" name="passwordP" placeholder="输入登录密码" class="login-input" value="">
+				</div>
+				<div class="login-item">
+					<input type="password" name="passwordN" placeholder="确认登录密码" class="login-input" value="">
+				</div>
+				<div class="login-item">
+					<input type="tel" name="rCode" placeholder="推荐码(选填)" class="login-input" value="">
+				</div>
+				<button type="submit" class="register-btn fs-15">立即注册</button>
+			</div>
+		</div>
+
+		<div class="tips-box"></div>
+	</div>
+	<script type="text/javascript">
+		$(function(){
+			//获取验证码
+			grtCode('share');
+			//注册
+			$('.register-btn').on('click',function(){
+				var phone = $("input[name='phone']").val();
+				var code = $("input[name='code']").val();
+				var passwordP = $("input[name='passwordP']").val();
+				var passwordN = $("input[name='passwordN']").val();
+				var rCode = $("input[name='rCode']").val();
+				if(!code || new RegExp(/^\s*$/).test(code)){
+					popup("验证码不能为空");
+					return false;
+				}else if(!passwordP){
+					popup("密码不能为空");
+					return false;
+				}else if (passwordP!=passwordN) {
+					popup("两次输入的密码不一致");
+					return false;
+				}
+				else{
+					register(phone,code,passwordP,passwordN,rCode);
+				}
+			})
+		})
+		//注册
+		function register(phone,code,passwordP,passwordN,rCode){
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=mobile_check";
+			var data={
+				mobile:phone,
+				code:code
+			}
+			$.post(url,data).success(function(res){
+				console.log(res);
+				if (res.errno=="0") {
+					popup('注册成功');
+					var mobile_token = res.data.mobile_token;
+					set_password(mobile_token,passwordN,rCode);
+					localStorage.setItem("mobile",phone);
+				}else{
+					popup(res.errmsg);
+				}
+			});
+		}
+
+		//设置密码
+		function set_password(mobile_token,passwordN,rCode){
+			console.log(mobile_token);
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=register";
+			var data={
+				mobile_token:mobile_token,
+				password:passwordN,
+				share:rCode
+			}
+			$.post(url,data).success(function(res){
+				console.log(res);
+				if (res.errno=="0") {
+					var access_token = res.data.access_token;
+					//console.log(access_token)
+					localStorage.setItem("access_token",access_token);
+					localStorage.setItem("hong","hong");
+					window.location.href='index.html';
+				}else{
+					popup(res.errmsg);
+				}
+			});
+		}
+
+	</script>
+</body>
+</html>

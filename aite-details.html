@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>交易详情</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='trade-record.html'">
+			<div class="back"></div>
+		</div>
+		<div class="page-title">交易详情</div>
+	</div>
+	<div class="container">
+		<div class="details">
+			<div class="order_details">
+				<div class="details-item">
+					<div class="details-con details-txt">订单号</div>
+					<div class="details-con details-info order_num">45821481171284158</div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">交易类型</div>
+					<div class="details-con details-info order_type"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">交易艾特币</div>
+					<div class="details-con details-info o-color order_money" style="font-size:1.8rem">10个</div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">交易时间</div>
+					<div class="details-con details-info order_time">2018-1-1 12:25:25</div>
+				</div>
+<!-- 				<div class="details-item">
+					<div class="details-con details-txt">余额</div>
+					<div class="details-con details-info order_balance">600.00元</div>
+				</div> -->
+			</div>
+
+		</div>
+	</div>
+	<script type="text/javascript">
+		$(function(){
+			var access_token=localStorage.getItem("access_token");
+			if (!access_token) {
+				window.location.href="login.html";
+			}else{
+				var deal_id=getParamString("deal_id");
+				var url="http://dev.weibanker.cn/chenchangping/atc/api?url=coin_deal_info";
+				var data={
+					access_token:access_token,
+					deal_id:deal_id
+				}
+				$.post(url,data).success(function(res){
+					console.log(res)
+					if (res.errno==="0") {
+						console.log(status(res.data.status));
+						$('.order_details .order_num').html(res.data.orderid);
+						$('.order_details .order_status').html( status(res.data.status));
+						$('.order_details .order_type').html(res.data.title);
+						$('.order_details .order_money').html(isNum(res.data.type)+res.data.num+"个");
+						$('.order_details .order_time').html(res.data.create_time);
+						$('.order_details .order_balance').html(res.data.balance+"元");
+					}else if (res.errno=="401") {
+				 		popup(res.errmsg);
+						setTimeout(function(){
+							localStorage.removeItem("access_token");
+							window.location.href='login.html';
+						},1800)
+					}else{
+						popup(res.errmsg);
+					}
+				});
+			}
+
+		})
+		function isNum(num){
+			switch (num) {
+				case 1:
+					return '+';
+					break;
+				case -1:
+					return '-';
+					break;
+			}
+		}
+		function status(num){
+			switch (num) {
+				case '0':
+					return '审核中';
+					break;
+				case '-1':
+					return '已取消';
+					break;
+				case '3':
+					return '成功';
+					break;
+			}
+		}
+	</script>
+</body>
+</html>

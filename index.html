@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<!-- 是否启用 WebApp 全屏模式 -->
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<!-- 设置状态栏的背景颜色 -->
+		<meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0" />
+		<meta name="format-detection" content="telephone=no,email=no" />
+		<!-- 禁止数字识自动别为电话号码 -->
+		<!-- 不让android识别邮箱 -->
+		<title>首页</title>
+		<link rel="stylesheet" type="text/css" href="css/swiper.min.css">
+		<link rel="stylesheet" type="text/css" href="css/common.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css?v=3.3">
+		<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="js/resize.js"></script>
+		<script type="text/javascript" src="js/common.js"></script>
+	</head>
+
+	<body>
+		<div class="container" style="background-color:#f9f9f9;padding:0;width:100%;height:100%;position:fixed">
+			<div class="flicker none">
+				<div class="flicker-top">
+					<div><img src="images/default-head.png" class="flicker-img1"></div>
+					<div><img src="images/img-002.png" class="flicker-img2"></div>
+				</div>
+				<div class="flicker-bottom">
+					<img src="images/img-003.png" class="flicker-img3">
+				</div>
+			</div>
+			<div class="index-t-top">
+				<div class="page-top">
+					<div class="back-btn" id="scan" style="margin-top: -0.3rem;"><img src="images/icon-01.png"></div>
+					<div class="page-title">首页</div>
+			 		<div class="page-right"><a href="me.html"><div class="personal"><img src="images/icon-02.png"></div></a></div> 
+				</div>
+			</div>
+			<div class="index-banner">
+				<div class="index-swiper-container">
+					<div class="swiper-wrapper">
+						<div class="swiper-slide">
+							<img src="images/img-1.jpg">
+						</div>
+					</div>
+					<div class="swiper-pagination swiper-pagination-clickable"></div>
+				</div>
+			</div>
+			<div class="index-top">
+				<!--<div class="index-t-middle">
+				<div class="scan-mask"><img src="images/icon-01.png" class="scan"></div>
+				<div style="color:#4caefb;padding:1.2rem 0;" class="fs-14">扫码支付</div>
+			</div>-->
+				<div class="index-t-bottom clearfix fs-13">
+					<div class="index-user">
+						<div class="index-user-img"><img class="imgBR" id="headimgurl" src="images/default-head.png" /></div>
+						<div class="index-user-info">
+							<p class="index-user-name">昵称：<span id='nickname'></span></p>
+							<p class="index-user-code">推荐码：<span id='share'></span></p>
+						</div>
+					</div>
+					<a href="balance.html">
+						<p>余额</p>
+						<p class="" style="margin-top:1rem;" id="money">0.00</p>
+					</a>
+					<a href="digital-assets.html">
+						<p>艾特币</p>
+						<p class="" style="margin-top:1rem;" id="coin">0.00</p>
+					</a>
+					<a href="convertibility.html">
+						<p>积分</p>
+						<p class="" style="margin-top:1rem;" id="score">0.00</p>
+					</a>
+				</div>
+			</div>
+			<div class="index-menu">
+				<div class="index-menu-title">—ATC菜单—</div>
+				<div class="index-fun">
+					<div id="1" class="goto index-b-img index-bottom-item"><img src="images/index1-1.png"></div>
+					<!--<p class="index-b-txt">转出</p>-->
+					<div id="2" class="goto index-b-img index-bottom-item"><img src="images/index1-2.png"></div>
+					<!--<p class="index-b-txt">转入</p>-->
+				</div>
+				<div class="index-fun">
+					<div id="3" class="goto index-b-img index-bottom-item "><img src="images/index2-1.png"></div>
+					<!--<p class="index-b-txt">买入</p>-->
+					<div id="4" class="goto index-b-img index-bottom-item"><img src="images/index2-2.png"></div>
+					<!--<p class="index-b-txt">卖出</p>-->
+				</div>
+				<div class="index-fun">
+					<div id="5" class="goto index-b-img index-bottom-item"><img src="images/index3-1.png"></div>
+					<!--<p class="index-b-txt">数字资产</p>-->
+					<div id="6" class="goto index-b-img index-bottom-item"><img src="images/index3-2.png"></div>
+					<!--<p class="index-b-txt">我的商城</p>-->
+				</div>
+			</div>
+
+			<div class="tips-box"></div>
+			<div class="result-pup">
+				<div class="result-mask">
+					<img src="images/warn.png" style="width:5rem;margin-bottom:1rem">
+					<div class="result-tip">
+
+					</div>
+					<div class="result-btn">确定</div>
+				</div>
+				<div class="result-close"><img src="images/fork-icon.png"></div>
+			</div>
+		</div>
+		<div class="red-pup none">
+			<div class="red-bao2" style="position: absolute;top:10%">
+				<img src="images/hongbao2.png">
+				<div style="color:#ffee43;position:absolute;width: 60%;left: 20%;bottom:20%;font-size:1.5rem"><span class="red-name"></span>注册红包</div>
+				<a href="javascript:void(0)" class="red-btn fs-15">存入资产</a>
+			</div>
+		</div>
+		<div class="sign-in-data none">
+			<div class="red-bao2" style="position: absolute;top:10%">
+				<img src="images/signs.png">
+				<div class="sign-money" style="color:#ef2947;position:absolute;width: 60%;left: 20%;top:34%;font-size:2.6rem">18.8元</div>
+				<div class="sign-score" style="color:#ccc;position:absolute;width: 60%;left: 20%;top:45%;font-size:1.6rem">积分：20分</div>
+				<div style="color:#ffee43;position:absolute;width: 60%;left: 20%;bottom:20%;font-size:1.5rem"><span class="red-name"></span>签到红包</div>
+				<a href="javascript:void(0)" class="red-btn fs-15">存入资产</a>
+			</div>
+		</div>
+		<div class="sign-in-mask none">
+			<div class="sign-in">
+				<div style="font-size:2.2rem;margin:.5rem 0">恭喜您</div>
+				<div style="font-size:1.6rem;margin:.5rem 0">您已获得<span style="color:#ef2947;font-weight:bold;margin:.5rem 0">加速释放</span>的权限</div>
+				<div style="font-size:1.4rem;color:#aaa;margin:.5rem 0">可将存储余额兑换成积分</div>
+				<img src="images/sign.png" style="width:6.2rem;margin:.5rem 0">
+				<div>
+					<div class="fs-14" style="font-weight:bold;margin:.5rem 0">有效时间</div>
+					<div class="fs-14">
+						<div style="color:#ef2947;margin:.5rem 0"><span class="pre_data">2018.09.09</span> 00:00:00</div>
+						<div style="margin:.5rem 0">至</div>
+						<div style="color:#ef2947;margin:.5rem 0"><span class="pre_data">2018.09.09</span> 23:59:59</div>
+					</div>
+				</div>
+				<div class="fs-14 sign-in-btn" style="background-color:#ef2947;color:#fff;padding:.6rem 0;border-radius: .3rem;margin:1rem 0">确认</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="js/swiper.min.js"></script>
+		<script type="text/javascript">
+			localStorage.setItem('numkey', 0)
+			var access_token = localStorage.getItem("access_token");
+			var hong = localStorage.getItem("hong");
+			document.domain = 'aitechain12345.com';
+			
+			$('.goto').on('click',function(e){
+				console.log(e)
+				if(!access_token) {
+					$('.flicker').removeClass('none');
+					setTimeout(function() {
+						$('.flicker').hide();
+					}, 3000)
+					$(document).click(function() {
+						window.location.href = "login.html";
+					});
+				} else {
+					let num = e.currentTarget.id
+					if(num == 3 || num == 4){
+						var url="http://dev.weibanker.cn/chenchangping/atc/api?url=check_money_status";
+						var data={
+							access_token:access_token,
+						}
+						$.post(url,data).success(function(res){
+							if(res.errno == 10024){
+								popup(res.errmsg)
+								setTimeout(function(){
+									window.location.href='pw-retrieve.html?type=pay&pn=1'
+								},1000)
+								return;
+							}
+							if(res.errno == 10025){
+								popup(res.errmsg)
+								setTimeout(function(){
+									window.location.href='me-bank-add.html'
+								},1000)
+								return;
+							}
+							if(res.errno != 0){
+								popup(res.errmsg)
+								return;
+							}
+							gotopage(num)
+						})
+					} else {
+						gotopage(num)
+					}
+				}
+			})
+			function gotopage(num){
+				switch(num){
+					case '1': 
+					window.location.href='roll-out.html'
+					break;
+					case '2': 
+					window.location.href='roll-in.html'
+					break;
+					case '3': 
+					window.location.href='buy-sell.html?type=1'
+					break;
+					case '4': 
+					window.location.href='buy-sell.html?type=2'
+					break;
+					case '5': 
+					window.location.href='digital-assets.html'
+					break;
+					case '6': 
+					window.location.href='https://www.aitechain12345.com/ebay/'
+					break;
+					default:
+				}
+			}
+			setCookie('masswise-token', access_token)
+
+			function setCookie(c_name, value, expiredays) {
+				var exdate = new Date();
+				exdate.setDate(exdate.getDate() + expiredays);
+				document.cookie = c_name + "=" + escape(value) + ((expiredays == null) ? "" : ";expires=" + exdate.toGMTString()) + ";path=/";
+			}
+			getUser();
+				
+			function getUser(){
+				if(!access_token) {
+					$('.flicker').removeClass('none');
+					setTimeout(function() {
+						$('.flicker').hide();
+					}, 3000)
+					$(document).click(function() {
+						window.location.href = "login.html";
+					});
+				} else {
+					var url = "http://dev.weibanker.cn/chenchangping/atc/api?url=page_index";
+					var data = {
+						access_token: access_token
+					}
+					$.post(url, data).success(function(res) {
+						if(res.errno === "0") {
+							localStorage.setItem('start',1)
+							banner(res);
+							userinfo(res)
+						} else if(res.errno == "401") {
+							popup('登录信息已失效');
+							setTimeout(function() {
+								localStorage.removeItem("access_token");
+								window.location.href = 'login.html';
+							}, 1800)
+						} else {
+							popup("登录出错，请重新登录");
+							setTimeout(function() {
+								localStorage.removeItem("access_token");
+								window.location.href = 'login.html';
+							}, 1800)
+						}
+					});
+					if(hong) {
+						$('.red-pup').removeClass('none');
+						localStorage.removeItem("hong");
+						$('.red-btn').on('click', function() {
+							$('.red-pup').addClass('none');
+							$('.sign-in-mask').removeClass('none');
+							$('.pre_data').html(GetDateStr(1));
+							$('.sign-in-btn').on('click', function() {
+								$.post("http://dev.weibanker.cn/chenchangping/atc/api?url=member_signin", {
+									access_token: access_token,
+									type: 2
+								}).success(function(res) {
+									console.log(res)
+									if(res.errno === "0") {
+										$('.sign-in-mask').addClass('none');
+									} else if(res.errno == "401") {
+										popup(res.errmsg);
+										setTimeout(function() {
+											localStorage.removeItem("access_token");
+											window.location.href = 'login.html';
+										}, 1800)
+									}
+								});
+							})
+						})
+					} else {
+						$.post("http://dev.weibanker.cn/chenchangping/atc/api?url=member_signin", {
+							access_token: access_token,
+							type: 1
+						}).success(function(res) {
+							// console.log(GetDateStr(1));
+							console.log(res)
+							if(res.errno === "0") {
+								if(res.data.status === 0) {
+									popup(res.data.mag);
+									$('.sign-in-mask').removeClass('none');
+									$('.pre_data').html(GetDateStr(1));
+									$('.sign-in-btn').on('click', function() {
+										$.post("http://dev.weibanker.cn/chenchangping/atc/api?url=member_signin", {
+											access_token: access_token,
+											type: 2
+										}).success(function(res) {
+											console.log(res)
+											if(res.errno === "0") {
+												$('.sign-in-mask').addClass('none');
+												if(res.data.money != null) {
+													$('.sign-money').html(res.data.money + "元");
+												} else {
+													$('.sign-money').html("0元");
+												}
+												if(res.data.score != null) {
+													$('.sign-score').html("积分：" + res.data.score + "分");
+												} else {
+													$('.sign-score').html("积分：0分");
+												}
+												if((res.data.money != null) || (res.data.score != null)) {
+													$('.sign-in-data').removeClass('none');
+													$('.red-btn').on('click', function() {
+														$('.sign-in-data').addClass('none');
+													})
+												}
+											} else if(res.errno == "401") {
+												popup(res.errmsg);
+												setTimeout(function() {
+													localStorage.removeItem("access_token");
+													window.location.href = 'login.html';
+												}, 1800)
+											}
+										});
+									})
+								};
+							}
+						});
+					}
+				}
+			}
+
+			function GetDateStr(AddDayCount) {
+				var dd = new Date();
+				dd.setDate(dd.getDate() + AddDayCount); //获取AddDayCount天后的日期
+				var y = dd.getFullYear();
+				var m = dd.getMonth() + 1; //获取当前月份的日期
+				var d = dd.getDate();
+				return y + "." + m + "." + d;
+			}
+
+			function banner(res) {
+				var banner_str = "";
+				var str = "";
+				for(var i = 0; i < res.data.banner.length; i++) {
+					str += '<a href="javascript:void(0)" class="swiper-slide">' +
+						' <img src="' + res.data.banner[i].img_path + '">' +
+						'</a>';
+				}
+				banner_str = '<div class="swiper-wrapper">' +
+					str +
+					'</div>' +
+					'<div class="swiper-pagination swiper-pagination-clickable"></div>'
+				$('.index-swiper-container').html(banner_str);
+				var swiper = new Swiper('.index-swiper-container', {
+					autoplay: true,
+					pagination: {
+						el: '.swiper-pagination',
+						clickable: true,
+					},
+					loop: true,
+					speed: 300,
+				});
+			}
+
+			function userinfo(res) {
+				console.log(res)
+				if(res.data.userinfo.headimgurl == "") {
+					$('#headimgurl').attr('src', 'images/default-head.png')
+				} else {
+					$('#headimgurl').attr('src', res.data.userinfo.headimgurl)
+				}
+				$('#nickname').html(res.data.userinfo.nickname);
+				$('#score').html(res.data.userinfo.score);
+				$('#money').html(res.data.userinfo.money);
+				$('#coin').html(res.data.userinfo.coin);
+				$('#share').html(res.data.userinfo.share);
+				if(res.data.userinfo.level === "2") {
+					$('#vip').removeClass('none')
+				}
+				$('.red-name').html(res.data.userinfo.nickname);
+				var share = res.data.userinfo.share;
+				// localStorage.setItem("share",share);
+
+			}
+
+			var browser = {
+				version: function() {
+					var u = navigator.userAgent,
+						app = navigator.appVersion;
+					return {
+						trident: u.indexOf('Trident') > -1, //IE内核
+						presto: u.indexOf('Presto') > -1, //opera内核
+						webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+						gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+						mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+						ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+						android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+						iPhone: u.indexOf('iPhone') > -1, //是否为iPhone
+						iPad: u.indexOf('iPad') > -1, //是否iPad
+					};
+				}(),
+			};
+			//console.log(browser);
+
+			//扫描结果回调方法，content是扫描到的内容，status是个表示状态的数字，0表示成功扫描，1表示取消扫描
+			var link = window.parent.location.href;
+			link = link.substring(0, link.lastIndexOf('/') + 1);
+
+			function scanCallback(content, status) {
+				//alert("conent:"+content + ", status:" +status);
+				if(status == 0) {
+					var x_link = content.substring(0, link.lastIndexOf('/') + 1);
+					//alert("content"+x_link+"link"+link)
+					if(x_link == link) {
+						window.location.href = content;
+					};
+				} else {
+					resuleTip("扫码出错");
+				}
+			}
+
+			$("#scan").click(function() {
+				if(!access_token) {
+					window.location.href = "login.html";
+				} else {
+					if(browser.version.android) {
+						Aitechain.scanQRCode('scanCallback'); // 调用扫描二维码
+					} else if(browser.version.ios || browser.version.iPad || browser.version.iPhone) {
+						window.webkit.messageHandlers.scanQRCode.postMessage({
+							scanCallback: 'scanCallback'
+						});
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>

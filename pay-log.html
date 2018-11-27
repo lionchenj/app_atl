@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>交易记录</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=1.1">
+    <link rel="stylesheet" type="text/css" href="css/mui.min.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+    <script type="text/javascript" src="js/mui.min.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.history.go(-1)"><div class="back"></div></div>
+		<div class="page-title">交易记录</div>
+	</div>
+	<div class="container" style="background-color:#f9f9f9">
+		<div class="trade-order-title" 	style="padding:0">
+			<div class="trade-order trade-order-buy trade-order-active" type="11">未完成买入</div>
+			<div class="trade-order trade-order-sell" type="13">已完成买入</div>
+			<div class="trade-order trade-order-sell" type="21">未完成卖出</div>
+			<div class="trade-order trade-order-sell" type="23">已完成卖出</div>
+		</div>
+		<div class="digi-order-list">
+			<ul id="OA_task_1" class="mui-table-view">
+			</ul>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var types = ''
+		var access_token=localStorage.getItem("access_token");
+		if (!access_token) {
+		 	popup("您还未登录，请先登录");
+			setTimeout(function(){
+				window.location.href='login.html';
+			},1800)
+		}else{
+			var type=1;
+			var status=1;
+			orderList(type, status);
+			$('.trade-order').on('click',function(){
+				$(this).siblings().removeClass('trade-order-active')
+				$(this).addClass('trade-order-active');
+				var $tradList=$(this)
+				if ($(this).hasClass('trade-order-buy')) {
+					$('.trade-buy-list').removeClass('none');
+					$('.trade-sell-list').addClass('none');
+				}else{
+					$('.trade-buy-list').addClass('none');
+					$('.trade-sell-list').removeClass('none');
+				}
+				types=$(this).attr('type');
+				switch(types){
+					case '11':
+						type=1;
+						status=1;
+					break;
+					case '13':
+						type=1;
+						status=3;
+					break;
+					case '21':
+						type=2;
+						status=1;
+					break;
+					case '23':
+						type=2;
+						status=3;
+					break;
+				}
+				orderList(type, status)
+			})
+		}
+		function erStatus (status) {
+			switch(status){
+				case '0':
+				return '等待买家确认付款'
+				break;
+				case '1':
+				return '等待卖家确认'
+				break;
+				case '2':
+				return '卖家确认超时 订单锁定'
+				break;
+				case '3':
+				return '订单完成'
+				break;
+			}
+		}
+		//获取列表
+		function orderList(type, status){
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_balance_deal";
+			var money=$("input[name='money']").val();
+			var mobile=$('#mobile').html();
+			var data={
+				access_token:access_token,
+				is_my:1,
+				type:type,
+				status:status
+			}
+			var order_str="";
+			let types = type+status
+			$.post(url,data).success(function(res){
+				console.log(res)
+				var obj= $('.digi-order-list');
+				loadingStart(obj)
+				obj.html('<ul id="OA_task_1" class="mui-table-view"></ul>')
+				if (res.errno=="0") {
+					//console.log(type)
+					if (res.data!=null) {
+						for (var i = 0; i<res.data.length;i++) {
+							var player = ''
+							var id = ''
+							let status = ''
+							if(type == 1){
+								player = res.data[i].seller_infp
+								id = res.data[i].seller
+								status = erStatus(res.data[i].status)
+							} else {
+								player = res.data[i].buyer_infp
+								id = res.data[i].buyer
+								status = erStatus(res.data[i].status)
+							}
+							var order_str="";
+							order_str = `<li id="order${i}" class="mui-table-view-cell" data-orderid="${res.data[i].orderid}">
+										        <div class="mui-slider-handle">
+										          <div class="line-normal-wrapper">
+										                <div class="line-normal-left-wrapper">
+									                        <div class="trade-bl-img-mask"><img src="${headImgurl(player.headimgurl)}"></div>
+									                        <div class="trade-bl-txt">
+								                                <p>${player.nickname}</p>
+								                                <p class="g-color" style="padding-top:.5em;">${ res.data[i].create_time }</p>
+									                        </div>
+										                </div>
+										                <div class="line-normal-right-wrapper">
+									                        <p class="o-color fs-16">${res.data[i].money}</p>
+									                        <p class="fs-14" style="margin-top: 1rem;">${status}</p>
+										                </div>
+										          </div>
+										     </div>
+										</li>`
+							$('#OA_task_1').append(order_str)
+							$("#order"+i).on("click",function(e){ 
+								window.location.href = 'buyselldeails.html?orderid='+e.currentTarget.dataset.orderid+'&types='+ types
+							})
+						};
+						loadingEnd();
+					}else{
+						$('.digi-order-list').html('<div style="font-size:1.4rem;margin-top:2rem">暂时还没有数据</div>')
+					}
+				}else if (res.errno=="401") {
+					 popup(res.errmsg);
+					 setTimeout(function(){
+					 	window.location.href='login.html';
+					 },1800)
+				}else{
+					popup(res.errmsg);
+				}
+			});
+		}
+	</script>
+</body>
+</html>

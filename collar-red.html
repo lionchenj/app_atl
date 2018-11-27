@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>ATC</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v-1.1.5">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<!-- <div class="page-top">
+		<div class="back-btn" onclick="javascript:history.back(-1);">
+			<div class="back"></div>
+		</div>
+		<div class="page-title">ATC</div>
+	</div> -->
+	<div class="container" style="width:100%;height:100%;position:fixed">
+		<div class="red-con">
+			<!-- <div style="margin-top:19%;"><img src="images/hong-bg1.png" alt=""></div> -->
+			<div style="text-align: center;margin-top: 60%;">
+				<div style="width:90%;display: inline-block;position:relative;">
+					<img src="images/hong-bg2.png" alt="">
+					<div style="position:absolute;top:0;left:0;width:100%;height:100%;padding: 2rem;">
+						<div id="share" class="fs-18" style="color: #FFF">
+							<span>推广码</span>
+						</div>
+						<div class="red-item clearfix">
+							<span>手机号码</span>
+							<input type="tel" name="phone" placeholder="手机号码" class="login-input" value="" >
+						</div>
+						<div class="red-item clearfix">
+							<span>验证码</span>
+							<input type="tel" name="code" placeholder="验证码" class="login-input" value="" >
+							<button type="button" class="get-code" id="get-code" style="border-radius:.5rem;background-color:#f1bd43">获取验证码</button>
+						</div>
+						<div class="red-item clearfix">
+							<span>登录密码</span>
+							<input type="tel" name="password" placeholder="登录密码" class="login-input" value="" >
+						</div>
+						<div class="red-item clearfix" style="display:none">
+							<span>推广码</span>
+							<input type="tel" name="share" placeholder="推广码" class="login-input" value="">
+						</div>
+					</div>
+				</div>
+				<button type="submit" class="register-btn red-register-btn fs-15">注册</button>
+			</div>
+
+		</div>
+		<div class="tips-box"></div>
+	</div>
+	<div class="red-pup" style="display:none">
+		<div class="red-bao">
+			<img src="images/hongbao.png">
+				<div id="downloadapp" class="red-confirm-btn fs-15">确定</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		$('#downloadapp').on('click',function(){
+			let mobtype = navigator.userAgent
+			if(mobtype.indexOf('iPhone') == -1){
+				window.location.href='https://www.aitechain12345.com/android/app-release.apk'
+			}else{
+				window.location.href='itms-services://?action=download-manifest&url=https://www.aitechain12345.com/ios/manifest.plist'
+			}
+		})
+		$(function(){
+			//获取验证码
+			grtCode('share');
+			var share=GetQueryString("share");
+			$("#share").append(share)
+			// $("input[name='share']").val(share);
+			//注册
+			$('.register-btn').on('click',function(){
+				var phone = $("input[name='phone']").val();
+				var code = $("input[name='code']").val();
+				var password = $("input[name='password']").val();
+				if(!code || new RegExp(/^\s*$/).test(code)){
+					popup("验证码不能为空");
+					return false;
+				}else if(!password){
+					popup("密码不能为空");
+					return false;
+				}else{
+					register(phone,code,password,share);
+				}
+			})
+		})
+		//注册
+		function register(phone,code,password,share){
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=mobile_check";
+			var data={
+				mobile:phone,
+				code:code
+			}
+			$.post(url,data).success(function(res){
+				console.log(res);
+				if (res.errno=="0") {
+					var mobile_token = res.data.mobile_token;
+					set_password(mobile_token,password,share);
+					$('.red-pup').fadeIn();
+				}else{
+					popup(res.errmsg);
+				}
+			});
+		}
+
+		//设置密码
+		function set_password(mobile_token,password,share){
+			console.log(mobile_token);
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=register";
+			var data={
+				mobile_token:mobile_token,
+				password:password,
+				share:share
+			}
+			$.post(url,data).success(function(res){
+				console.log(res);
+				if (res.errno=="0") {
+					var access_token = res.data.access_token;
+					//console.log(access_token)
+					localStorage.setItem("access_token",access_token);
+					window.location.href='index.html';
+				}else{
+					popup(res.errmsg);
+				}
+			});
+		}
+	</script>
+</body>
+</html>

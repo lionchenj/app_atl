@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>转出金额</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='index.html'"><div class="back"></div></div>
+		<div class="page-title">转出金额</div>
+	</div>
+	<div class="container">
+		<div class="roll-top-info" style="padding: 2rem 0">
+			<div class="roll-head-mask">
+				<img src="" class="roll-info-head" id="headimgurl">
+			</div>
+			<div class="roll-info-name" id="nickname"></div>
+			<div class="roll-info-phone" id="mobile"></div>
+		</div>
+		<div class="roll-title">转出金额</div>
+		<div class="roll-input-mask">
+			<input type="number" name="money" autofocus="autofocus" class="amount-input" value="">
+			<div class="rmb-mask">¥</div>
+			<div class="fork-mask">
+				<img src="images/fork-icon.png">
+			</div>
+		</div>
+		<div class="confirm-btn-mask">
+			<button type="button" class="blue-btn confirm-btn">确认转出</button>
+		</div>
+		<div class="pay-pup">
+			<div class="pay-mask">
+				<img src="images/fork-icon.png" class="pay-close" >
+				<div class="pay-title">请输入支付密码</div>
+				<ul class="mm_box">
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			    </ul>
+			    <div class="fs-15" style="text-align: right;padding:1rem 2rem 2rem 0"><a href="pw-retrieve.html?type=pay&pn=2">忘记密码?</a></div>
+				<div class="numb_box">
+					<ul class="nub_ggg">
+				      	<li><a href="javascript:void(0);">1</a></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">2</a></li>
+				      	<li><a href="javascript:void(0);">3</a></li>
+				      	<li><a href="javascript:void(0);">4</a></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">5</a></li>
+				      	<li><a href="javascript:void(0);">6</a></li>
+				      	<li><a href="javascript:void(0);">7</a></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">8</a></li>
+				      	<li><a href="javascript:void(0);">9</a></li>
+				      	<li><span></span></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">0</a></li>
+				      	<li><span  class="del" > <img src="images/jftc_18.jpg"></span></li>
+				    </ul>
+			    </div>
+			</div>
+		</div>
+		<div class="tips-box"></div>
+		<div class="result-pup">
+			<div class="result-mask">
+				<img src="images/warn.png" style="width:5rem;margin-bottom:1rem">
+				<div class="result-tip">
+					溜溜达达连绵起伏窝囊废可能缺乏可减轻北方栖姬qk
+				</div>
+				<div class="result-btn">确定</div>
+			</div>
+			<div class="result-close"><img src="images/fork-icon.png"></div>
+		</div>
+	</div>
+<!-- 	<div class="roll-pup-mask" style="display:none">
+		<div class="roll-pup">
+			<div class="roll-code-mask">
+				<input type="number" name="" autofocus="autofocus" class="amount-input" value="">
+				<button type="button" class="get-code" id="get-code" style="border-radius: 1rem;">获取验证码</button>
+			</div>
+			<div class="confirm-btn-mask">
+				<button type="button" class="blue-btn confirm_btn2">确认转出</button>
+			</div>
+			<div class="close-pup-mask">
+				<img src="images/fork-icon.png">
+			</div>
+		</div>
+	</div> -->
+
+	<!-- <div class="tips-box"></div> -->
+	<script type="text/javascript">
+		$(function(){
+			$('.amount-input').bind('input propertychange', function() {
+				var val=$(this).val();
+				val=val.replace(/^[0]+[0-9]*$/gi,"");
+				console.log(val)
+				$(this).val(val);
+			});
+			$('.fork-mask').on('click',function(){
+				$('.amount-input').val("");
+			})
+			$('.close-pup-mask').on('click',function(){
+				$('.roll-pup-mask').hide();
+			})
+
+		})
+		$(function(){
+			var access_token=localStorage.getItem("access_token");
+			if (!access_token) {
+				window.location.href="login.html";
+			}else{
+				var mobile=getParamString('mobile')
+				var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_money_confirm";
+				var data={
+					access_token:access_token,
+					mobile:mobile,
+				}
+				$.post(url,data).success(function(res){
+					if (res.errno=="0") {
+						console.log(res)
+						if (res.data.headimgurl=="") {
+							$('#headimgurl').attr('src','images/default-head.png')
+						}else{
+							$('#headimgurl').attr('src',res.data.headimgurl)
+						}
+						$('#mobile').html(res.data.mobile);
+						$('#nickname').html(res.data.nickname);
+					}else if (res.errno=="401") {
+						 popup(res.errmsg);
+						 setTimeout(function(){
+						 	window.location.href='login.html';
+						 },1800)
+					}
+				});
+				var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_money_score";
+				var data={
+					access_token:access_token
+				}
+				$.post(url,data).success(function(res){
+					console.log(res)
+					if (res.errno=="0") {
+						if (res.data.score<1000){
+							popup("积分超过1000才能转出");
+							//return false;
+							window.location.href='convertibility.html';
+						}
+					}
+				});
+				//显示浮动
+				$('.confirm-btn').on('click',function(){
+					var val=$('.amount-input').val();
+					if (val=="") {
+						popup("请输入金额");
+						return false;
+					}else if(val<1){
+						popup("请输入大于1的金额");
+						return false;
+					}
+
+
+					$(".pay-pup").show();
+				})
+				function createOrder(){
+					var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_money_deal";
+					var money=$("input[name='money']").val();
+					var mobile=$('#mobile').html();
+					var data={
+						access_token:access_token,
+						money:money,
+						mobile:mobile
+					}
+					$.post(url,data).success(function(res){
+						if (res.errno=="0") {
+							popup('转出成功');
+							window.location.href='balance.html';
+							console.log("1");
+						}else if (res.errno=="401") {
+							 popup(res.errmsg);
+							 setTimeout(function(){
+							 	window.location.href='login.html';
+							 },1800)
+						}else{
+							popup(res.errmsg);
+							payClose();
+						}
+						console.log(res)
+					});
+				}
+				pay_pwd_check(access_token,createOrder);
+			}
+
+		})
+	</script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>上传头像</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=1.02">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='me-info.html'"><div class="back"></div></div>
+		<div class="page-title">上传头像</div>
+	</div>
+	<div class="container">
+		<div class="up-head-mask">
+			<img src="" class="up-head" id="headimgurl" capture="camera"/>
+			<input type="file" accept="image/*" class="photo-input" />
+		</div>
+		<div class="me-tip">上传您满意的头像</div>
+	</div>
+	<div class="blue-btn-mask">
+		<button type="button" class="blue-btn confirm-btn">确认上传</button>
+	</div>
+	<div class="tips-box"></div>
+	<script type="text/javascript">
+
+		// $(".photo-input").on("change",function(){
+		// 	var file = this.files[0];
+		// 	var imgSize = file.size;
+		// 	var FileData = new FormData();
+		// 	FileData.append('imageFile', this.files[0]);
+		// 	if(imgSize>1*1024*1024){
+		// 		popup('图片不能大于1M',1000);
+		// 	}else{
+		// 		$.ajax({
+		// 			url:'http://dev.weibanker.cn/liwenjian/spywechat/file/update',
+		// 			type:'POST',
+		// 			data:FileData,
+		// 			cache: false,
+		// 			contentType: false, //必填
+		// 			processData: false, //必填
+		// 			success:function(res){
+		// 				console.log(res)
+		// 				if(res.status == 1){
+		// 					// changeMyHead(localStorage.getItem('token'),res.path);
+		// 				}else if(res.status == 0){
+
+		// 					// if(!isEng()){
+		// 					// 	popup('没有获取到图片',800)
+		// 					// }else{
+		// 					// 	popup('No pictures are available.',800)
+		// 					// }
+
+		// 				}
+		// 			},
+		// 			// error:function(){
+		// 			// 	if(!isEng()){
+		// 			// 		popup("登录信息失效",1000)
+		// 			// 		setTimeout(function(){
+		// 			// 			window.location.href = '../lang_ch/login.html'
+		// 			// 		},1000);
+		// 			// 	}else{
+		// 			// 		popup("Invalid login information",1000)
+		// 			// 		setTimeout(function(){
+		// 			// 			window.location.href = '../lang_en/login.html'
+		// 			// 		},1000);
+		// 			// 	}
+		// 			// }
+		// 		})
+		// 	}
+		// })
+		var access_token=localStorage.getItem("access_token");
+		if (!access_token) {
+			$(document).click(function() {
+				window.location.href="login.html";
+			});
+		}else{
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=get_member_info";
+			var data={
+				access_token:access_token
+			}
+			$.post(url,data).success(function(res){
+
+				if (res.errno==="0") {
+					// banner(res);
+					if (res.data.headimgurl=="") {
+						$('#headimgurl').attr('src','images/default-head.png')
+					}else{
+						$('#headimgurl').attr('src',res.data.headimgurl)
+					}
+				}else if (res.errno=="401") {
+				 		popup(res.errmsg);
+						setTimeout(function(){
+							localStorage.removeItem("access_token");
+							window.location.href='login.html';
+						},1800)
+				}else{
+					popup("登录出错，请重新登录");
+					setTimeout(function(){
+						localStorage.removeItem("access_token");
+						window.location.href='login.html';
+					},1800)
+				}
+			});
+
+			$(".photo-input").on("change",function(){
+				console.log(44)
+				var file = this.files[0];
+				var imgSize = file.size;
+				var FileData = new FormData();
+				FileData.append('imageFile', this.files[0]);
+				// if(imgSize>2*1024*1024){
+				// 	popup('图片不能大于2M',1000);
+				// }else{
+					$.ajax({
+						url:"https://www.aitechain12345.com/ebei/file/update",
+						type:'POST',
+						data:FileData,
+						cache: false,
+						contentType: false,    //不可缺
+						processData: false,    //不可缺
+						success:function(res){
+							console.log(res);
+							if(res.status==1){
+								//popup('上传成功');
+								var headimgurl=res.path;
+								$('#headimgurl').attr('src',res.path)
+								$('.confirm-btn').on('click',function(){
+									changeInfo(access_token,headimgurl);
+								});
+							}
+						}
+					});
+				//}
+			})
+			function changeInfo(access_token,headimgurl){
+				var url="http://dev.weibanker.cn/chenchangping/atc/api?url=member_update";
+				var data={
+					access_token:access_token,
+					headimgurl:headimgurl
+				}
+				$.post(url,data).success(function(res){
+					if (res.errno==="0") {
+						popup("上传成功");
+						setTimeout(function(){
+							window.location.href='me-info.html';
+						},1800)
+					}
+				});
+			}
+
+		}
+
+		
+
+	// function changeMyHead(){
+	// 	//var headimgurl=$('.up-head').attr('src');
+	// 	console.log(headimgurl);
+	// 	var token = localStorage.getItem('token');
+	// 	console.log(token);
+	// 	var url="http://dev.weibanker.cn/liwenjian/spywechat/api/index/url/set_user_info";
+	// 	var data={
+	// 		token:token,
+	// 		headimgurl:headimgurl
+	// 	}
+	// 	$.post(url,data).success(function(res){
+	// 		console.log(res);
+	// 		if (res.errno==="100100") {
+	// 			popup(res.errmsg);
+	// 		}
+	// 	});
+	// }
+
+	</script>
+</body>
+</html>

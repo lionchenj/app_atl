@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"
+    />
+    <meta name="format-detection" content="telephone=no,email=no" />
+    <!-- 禁止数字识自动别为电话号码 -->
+    <!-- 不让android识别邮箱 -->
+    <title>余额列表</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css?v=1.5.2">
+    <link rel="stylesheet" type="text/css" href="css/mui.min.css">
+    <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="js/resize.js"></script>
+    <script type="text/javascript" src="js/mui.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+</head>
+
+<body>
+    <div class="page-top">
+        <div class="back-btn" onclick="window.location.href='index.html'">
+            <div class="back"></div>
+        </div>
+        <div class="page-title">余额</div>
+    </div>
+    <div class="container" style="background-color:#f9f9f9">
+        <div class="data-mask" onclick="window.location.href='data.html?type=balance'">
+            <div class="data clearfix">
+                <img src="images/data.png" style="width:1.7rem;">
+                <div id="show_year">2018</div>
+            </div>
+        </div>
+        <div class="digi-list digi-balance-list">
+            <ul id="OA_task_1" class="mui-table-view">
+
+            </ul>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //余额列表
+        if (GetQueryString("year") == null) {
+            var date = new Date;
+            var year = date.getFullYear();
+            console.log(year)
+            $('#show_year').val(year);
+        } else {
+            var year = GetQueryString("year");
+            $('#show_year').val(year);
+        }
+        console.log(GetQueryString("year"));
+
+var access_token = localStorage.getItem("access_token");
+            if (!access_token) {
+                window.location.href = "login.html";
+            } else {
+                var url = "http://dev.weibanker.cn/chenchangping/atc/api?url=page_money_lists";
+                var data = {
+                    access_token: access_token,
+                    year: year
+                }
+                $.post(url, data).success(function (res) {
+                    console.log(res);
+                    if (res.errno == "0") {
+                        if (res.data != null) {
+                            for (var i = 12; i >= 1; i--) {
+                                if (i < 10) {
+                                    i = "0" + i;
+                                };
+                                var balance_str = "";
+                                var str = "";
+                                if (res.data[i] != undefined) {
+                                    var leng = res.data[i].length;
+                                    var money = 0;
+                                    for (var j = 0; j < leng; j++) {
+                                        money = parseFloat(res.data[i][j].money) + parseFloat(money);
+                                        money = money.toFixed(2);
+                                        balance_str += '<li class="mui-table-view-cell">'
+                                        if ((res.data[i][j].title == "买入" || res.data[i][j].title == "卖出") &&
+                                            res.data[i][j].status == 0) {
+                                        	balance_str += '<div class="mui-slider-right mui-disabled">'
+                                            balance_str += '<a class="mui-btn mui-btn-red" id=' + res.data[i][j].orderid + '>删除</a>'
+                                        	balance_str += '</div>'
+                                        }
+                                        balance_str += '<div class="mui-slider-handle">'
+                                        balance_str += '<div class="line-normal-wrapper" orderid="' + res.data[i][j].orderid + '" id="' + res.data[i][j].title + '">'
+                                        balance_str += '<div class="line-normal-left-wrapper">'
+                                        balance_str += '<div class="line-normal-info-wrapper">'
+                                        balance_str += '<div class="line-normal-user-name">' + res.data[i][j].title + '</div>'
+                                        balance_str += '<div class="g-color line-normal-time ' + isBalanceShow(res.data[i][j].status) + '">余额:' + res.data[i][j].balance + '</div>'
+                                        balance_str += '<div class="o-color line-normal-time ' + isTipShow(res.data[i][j].status) + '"">'
+                                        if (res.data[i][j].title == "购买艾特币" || res.data[i][j].title == "出售艾特币") {
+                                            balance_str += status2(res.data[i][j].status)
+                                        } else {
+                                            balance_str += status(res.data[i][j].status)
+                                        }
+                                        balance_str += '</div>'
+                                        balance_str += '</div>'
+                                        balance_str += '</div>'
+                                        balance_str += '<div class="line-normal-right-wrapper">'
+                                        balance_str += '<div class="line-normal-right-info-wrapper">'
+                                        balance_str += '<div class="line-normal-right-user-name">' + isNum(res.data[i][j].type) + res.data[i][j].money + '</div>'
+                                        balance_str += '<div class="line-normal-right-time">' + res.data[i][j].create_time + '</div>'
+                                        balance_str += '</div>'
+                                        balance_str += '</div>'
+                                        balance_str += '</div>'
+                                        balance_str += '</div>'
+                                        balance_str += '</li>'
+                                    };
+                                    str = '<div class="trade-order-tip">' + i + '月 交易额:' + money + '元</div>';
+                                    $('#OA_task_1').append(str + balance_str);
+                                    $('.line-normal-wrapper').on('click', function () {
+                                        var orderid = $(this).attr('orderid');
+                                        var link = 'details.html?orderid=' + orderid;
+                                        window.location.href = link;
+                                    })
+                                };
+                            };
+                            $(document).ready(function(e) {
+                                var btnArray = ['确认', '取消'];
+                                $('#OA_task_1').on('tap', '.mui-btn', function(event) {
+                                    var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_money_del";
+                                    var data={ 
+                                        access_token:access_token,
+                                        orderid:event.target.id
+                                    }
+                                    $.post(url,data).success(function(res){
+                                        console.log(res)
+                                        window.location.reload()
+                                    })
+                                });
+                            });
+                        } else {
+                            $('.digi-balance-list').append(
+                                "<div class='g-color fs-16' style='margin-top:4rem'>没有找到相关记录</div>");
+                        }
+                    } else if (res.errno == "401") {
+                        popup(res.errmsg);
+                        setTimeout(function () {
+                            window.location.href = 'login.html';
+                        }, 1800)
+                    } else {
+                        popup(res.errmsg);
+                    }
+                });
+            }
+
+            function isNum(num) {
+                switch (num) {
+                    case 1:
+                        return '+';
+                        break;
+                    case -1:
+                        return '-';
+                        break;
+                }
+            }
+
+            function isBalanceShow(num) {
+                if (num == 3) {
+                    return '';
+                } else {
+                    return 'none';
+                }
+            }
+
+            function isTipShow(num) {
+                if (num == 3) {
+                    return 'none';
+                } else {
+                    return '';
+                }
+            }
+
+            function status(num) {
+                switch (num) {
+                    case "0":
+                        return '挂单中';
+                        break;
+                    case "-1":
+                        return '已取消';
+                        break;
+                    default:
+                        return '';
+                }
+            }
+
+            function status2(num) {
+                switch (num) {
+                    case "0":
+                        return '出售中';
+                        break;
+                    case "-1":
+                        return '已取消';
+                        break;
+                    default:
+                        return '';
+                }
+            }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>分享</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="js/clipboard.min.js"></script>
+
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='me.html'"><div class="back"></div></div>
+		<div class="page-title">分享</div>
+<!-- 		<div class="page-right"><a href="javascript:void(0)" class="tr-record">保存二维码</a></div> -->
+	</div>
+	<div class="container">
+		<div class="sahre-con">
+			<img src="images/share_bgn.png" class="share-bg">
+			<div><img src="images/share-img1.jpg" class="share-img"></div>
+			<div><img src="images/share-img2.jpg" class="share-img"></div>
+			<div><img src="images/share-img3.jpg" class="share-img"></div>
+			<div class="share-code"><img src="http://dev.weibanker.cn/chenchangping/atc/data/Two/153034147516397.png" class="share-erwei"></div>
+<!-- 			<div class="share-link" data-clipboard-text="888888888@qq.com"></div> -->
+			<button style="margin-top:1.5rem;text-align: center;background: rgba(0,0,0,0);" class="fs-16"><span style="padding:.2rem .5rem" class="share-link" data-clipboard-text="">复制分享链接</span></button>
+			<img src="images/share_bg2.png" class="share2-bg">
+		</div>
+		<div class="tips-box"></div>
+	</div>
+	<script type="text/javascript">
+		 var clipboard = new Clipboard('.share-link');
+	     clipboard.on('success', function(e) {
+	         popup("复制成功");
+	     });
+	     clipboard.on('error', function(e) {
+	        popup("复制失败，可分享二维码");
+	     });
+
+		$(function(){
+
+			var access_token=localStorage.getItem("access_token");
+			if (!access_token) {
+				 	popup("您还未登录，请先登录");
+					setTimeout(function(){
+						window.location.href='login.html';
+					},1800)
+			}else{
+				var share=GetQueryString("share");
+				console.log(share)
+					var link = window.parent.location.href;
+				link =link.substring(0,link.lastIndexOf('/')+1);
+				link=link+'collar-red.html?share='+share;
+				//$('.share-link').html(link)
+				$('.share-link').attr('data-clipboard-text',link)
+				console.log(link)
+				var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_receivables";
+				var data={
+					access_token:access_token,
+					url:link
+				}
+				$.post(url,data).success(function(res){
+					console.log(res);
+					if (res.errno=="0") {
+						$(".share-erwei").attr('src',res.data)
+						//$(".share-link").attr('src',res.data)
+					}else if (res.errno=="401") {
+				 		popup(res.errmsg);
+						setTimeout(function(){
+							localStorage.removeItem("access_token");
+							window.location.href='login.html';
+						},1800)
+					}else{
+						popup(res.errmsg);
+					}
+				});
+			}
+		});
+
+
+
+
+		// console.log( window.location.search);
+		// function GetQueryString(name) {
+		//     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+		//     var r = window.location.search.substr(1).match(reg);
+		//     if (r != null) {
+		//         return unescape(r[2]);
+		//     }
+		//     return null;
+		// }
+		// console.log(  GetQueryString("id"));
+	</script>
+</body>
+</html>

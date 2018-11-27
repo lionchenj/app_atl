@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>年份</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+<!-- 		<div class="back-btn"  onclick="javascript:history.back(-1);">
+			<div class="back"></div>
+		</div> -->
+		<div class="page-title">选择年份</div>
+	</div>
+	<div class="container">
+		<div class="year-top">
+			<div class="year-top-item pre" style="width:15%;text-align: left;left:0"><<</div>
+			<div class="year-top-item" style="width:70%;text-align: center;left:15%">选择年份</div>
+			<div class="year-top-item next" style="width:15%;text-align: right;right:0"> >> </div>
+		</div>
+		<div class="year-mask">
+			<input type="text" value="2018" readonly class="year-item">
+			<input type="text" value="2018" readonly class="year-item">
+			<input type="text" value="2018" readonly class="year-item">
+			<input type="text" value="2018" readonly class="year-item">
+			<input type="text" value="2018" readonly class="year-item">
+			<input type="text" value="2018" readonly class="year-item">
+			<input type="text" value="2018" readonly class="year-item">
+			<input type="text" value="2018" readonly class="year-item">
+			<input type="text" value="2018" readonly class="year-item">
+			<input type="text" value="2018" readonly class="year-item">
+		</div>
+	</div>
+	<script type="text/javascript">
+		// var preUrl=document.referrer;
+		// console.log(preUrl)
+		// if (document.referrer === '') {
+		//     // 没有来源页面信息的时候，改成首页URL地址
+		//     $('.back-btn').on('click',function(){
+		//     	window.location.reload();
+		//     })
+		//    //$('.top_back_box>a').attr('onclick','')
+		// }else{
+	 // 		$('.back-btn').on('click',function(){
+
+		//     	window.location.href=preUrl;
+		//     })
+		// 	//$('.top_back_box>a').attr('onclick',url)
+		// }
+
+		var date=new Date;
+		var year=date.getFullYear();
+		var minYear=1990;
+		function nextYear(){
+			var str =""
+			if ((year-minYear)>10){
+				for (var i = year; i>= (year-10);i--) {
+					str +='<input type="text" value="'+i+'" readonly class="year-item" onclick="getYear(this)">'
+				};
+				$('.year-mask').html(str);
+				year=(year-10);
+			}else if(0<(year-minYear)&&(year-minYear)<10){
+				console.log(77);
+				console.log(year-minYear)
+				for (var i = year;i>=minYear;i--) {
+					str +='<input type="text" value="'+i+'" readonly class="year-item" onclick="getYear(this)">';
+				};
+				$('.year-mask').html(str);
+				year=(year-10);
+			}
+		}
+		nextYear();
+
+		$('.next').on('click',function(){
+			nextYear();
+		})
+		$('.pre').on('click',function(){
+			var str =""
+			if ((date.getFullYear()-year)>=20){
+				console.log(222)
+				for (var i = year+20; i>=(year+10);i--) {
+					str +='<input type="text" value="'+i+'" readonly class="year-item" onclick="getYear(this)">'
+				};
+				$('.year-mask').html(str);
+				year=(year+10);
+			}
+		})
+		function getYear(obj){
+			var val = $(obj).val();
+			var type=GetQueryString("type");
+			console.log(type)
+			if (type==="trade") {
+				var link = 'trade-record.html?year='+val+'';
+			}else if(type==="balance"){
+				var link = 'balance.html?year='+val+'';
+			}else if (type==="integral") {
+				var link = 'integral.html?year='+val+'';
+			};
+			window.location.href=link;
+		}
+	</script>
+</body>
+</html>

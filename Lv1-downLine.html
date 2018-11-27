@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<!-- 是否启用 WebApp 全屏模式 -->
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+		<!-- 设置状态栏的背景颜色 -->
+		<meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0" />
+		<meta name="format-detection" content="telephone=no,email=no" />
+		<!-- 禁止数字识自动别为电话号码 -->
+		<!-- 不让android识别邮箱 -->
+		<title>订单</title>
+		<link rel="stylesheet" type="text/css" href="css/common.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="js/resize.js"></script>
+		<script type="text/javascript" src="js/common.js"></script>
+	</head>
+	<body>
+		<div class="page-top">
+			<div class="back-btn" onclick="javascript:history.back(-1);">
+				<div class="back"></div>
+			</div>
+			<div class="page-title">我的直接分享会员</div>
+		</div>
+		<div class="container" style="background-color:#f9f9f9"></div>
+		<script type="text/javascript">
+			var access_token = localStorage.getItem("access_token");
+			if(!access_token) {
+				window.location.href = "login.html";
+			} else {
+				showList()
+			}
+
+			function showList() {
+				let html = ''
+				console.log(access_token)
+				$.post("http://dev.weibanker.cn/chenchangping/atc/api?url=member_line",{access_token:access_token}).success(function(res){
+					console.log(res)
+					let data = res.data
+					for(let i of data) {
+						let src = "<div class='Lv1-vip'><img src=''/></div>";
+						if(i.level == 2){
+							src ="<div class='Lv1-vip'><img src='images/Lv1_vip.png' /></div>"
+						}
+						if(i.level == 3){
+							src ="<div class='Lv1-vip'><img src=''/>普通会员</div>"
+						}
+						if(i.headimgurl=='null' || i.headimgurl==''){
+							i.headimgurl='images/default-head.png';
+						}
+						html = `<div class="Lv1-list">
+								<div class="Lv1-img"><img src="${i.headimgurl}" /></div>
+								<div class="Lv1-info">
+									<div class="Lv1-name">${i.nickname}</div>
+									<div class="Lv1-phone">手机号码：${i.mobile}<div></div></div>
+									<div class="Lv1-time">注册时间：${i.time}<div></div></div>
+								</div>
+								${src}
+								</div>`
+						$('.container').append(html)
+						// $('#' + i.id).on('click', function(e) {
+						// 	alert(i.id)
+						// })
+					}
+				})
+			}
+		</script>
+	</body>
+
+</html>

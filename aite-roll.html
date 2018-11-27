@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>买入</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='trade.html'"><div class="back"></div></div>
+		<div class="page-title">买入</div>
+	</div>
+	<div class="container" style="background-color:#f9f9f9">
+			<a href="javascript:void(0)" class="me-list-item">
+				<div class="me-l-left">
+					<span class="me-l-txt">买入数额</span>
+				</div>
+				<div class="pw-r-input">
+					<input type="number" name="password" placeholder="请输入数额" class="login-input amount-input" value="">
+				</div>
+			</a>
+			<div class="exchange-mask">
+				<div class="exchange-item1 exchange-rmb" id="coin">100</div>
+				<div class="exchange-item2"><img src="images/icon-09.png" alt=""></div>
+				<div class="exchange-item3">
+					<p>金额</p>
+					<p class="exchange-aiteb" id="money">988898.00</p>
+				</div>
+			</div>
+		<div class="confirm-btn-mask">
+			<button type="button" class="blue-btn confirm-btn">买入</button>
+		</div>
+
+		<div class="pay-pup">
+			<div class="pay-mask">
+				<img src="images/fork-icon.png" class="pay-close" >
+				<div class="pay-title">请输入支付密码</div>
+				<ul class="mm_box">
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			      <li num=""></li>
+			    </ul>
+			    <div class="fs-15" style="text-align: right;padding:1rem 2rem 2rem 0"><a href="pw-retrieve.html?type=pay&pn=2">忘记密码?</a></div>
+				<div class="numb_box">
+					<ul class="nub_ggg">
+				      	<li><a href="javascript:void(0);">1</a></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">2</a></li>
+				      	<li><a href="javascript:void(0);">3</a></li>
+				      	<li><a href="javascript:void(0);">4</a></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">5</a></li>
+				      	<li><a href="javascript:void(0);">6</a></li>
+				      	<li><a href="javascript:void(0);">7</a></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">8</a></li>
+				      	<li><a href="javascript:void(0);">9</a></li>
+				      	<li><span></span></li>
+				      	<li><a href="javascript:void(0);" class="zj_x">0</a></li>
+				      	<li><span  class="del" > <img src="images/jftc_18.jpg"></span></li>
+				    </ul>
+			    </div>
+			</div>
+		</div>
+		<div class="tips-box"></div>
+		<div class="result-pup">
+			<div class="result-mask">
+				<img src="images/warn.png" style="width:5rem;margin-bottom:1rem">
+				<div class="result-tip">
+					溜溜达达连绵起伏窝囊废可能缺乏可减轻北方栖姬qk
+				</div>
+				<div class="result-btn">确定</div>
+			</div>
+			<div class="result-close"><img src="images/fork-icon.png"></div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		$(function(){
+			var type=getParamString('type');
+			var orderid=getParamString('orderid');
+			var coinNum=getParamString('coinNum');
+			if (type=="2") {
+				$('.page-title').html("买入");
+				$('.blue-btn').html('买入');
+				$('.me-l-txt').html('买入数额');
+			}else{
+				$('.page-title').html("卖出");
+				$('.blue-btn').html('卖出');
+				$('.me-l-txt').html('卖出数额');
+			}
+			$('#coin').html(coinNum);
+			$('.amount-input').val(coinNum)
+			var coin=coinNum;
+			// var money=$('#money').html();
+			var rate=localStorage.getItem("rate");
+			console.log(rate)
+			var money =parseFloat(coin)*parseFloat(rate);
+			$('#money').html(parseFloat(money).toFixed(2));
+
+			var access_token=localStorage.getItem("access_token");
+			if (!access_token) {
+				window.location.href='login.html';
+			}else{
+
+				$('.amount-input').bind('input propertychange', function() {
+					var val=$(this).val();
+					val=val.replace(/^[0]+[0-9]*$/gi,"");
+					console.log(val)
+					$(this).val(val);
+					if (val=="") {
+						$('#coin').html("0");
+						$('#money').html("0.00");
+					}else if(val % 1 != 0){
+						popup("请输入整数");
+						return false;
+					}else{
+						var coin =parseFloat(val);
+						console.log(val)
+						$('#coin').html(coin);
+						var money =parseFloat(coin)*parseFloat(rate);
+						$('#money').html(parseFloat(money).toFixed(2));
+					}
+				});
+
+				$('.confirm-btn').on('click',function(){
+					var coin=$('#coin').html();
+					if(coin % 1 != 0){
+						popup("请输入整数");
+						return false;
+					}else{
+						$(".pay-pup").show();
+					}
+				})
+
+				function createOrder(){
+					if (type=="1"){
+						var url="http://dev.weibanker.cn/chenchangping/atc/api?url=coin_deal_out";
+					}else{
+						var url="http://dev.weibanker.cn/chenchangping/atc/api?url=coin_deal_in";
+					}
+					var coin=$('#coin').html();
+					var data={
+						access_token:access_token,
+						num:coin,
+						orderid:orderid
+					}
+					$.post(url,data).success(function(res){
+						console.log(res)
+						if (res.errno=="0") {
+							popup('交易成功');
+							window.location.href='trade-record.html';
+							// $('.buy-btn').on('click',function(){
+							// 	// var orderid=$(this).attr('orderid');
+							// 	// var link='details.html?orderid='+orderid;
+							// 	// window.location.href=link;
+							// })
+						}else if (res.errno=="401") {
+							 popup(res.errmsg);
+							 setTimeout(function(){
+							 	window.location.href='login.html';
+							 },1800)
+						}else{
+							popup(res.errmsg);
+							payClose();
+						}
+					});
+				}
+				pay_pwd_check(access_token,createOrder)
+			}
+		});
+	</script>
+</body>
+</html>

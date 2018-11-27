@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>我的银行卡</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="js/country.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='me.html'"><div class="back"></div></div>
+		<div class="page-title">我的银行卡</div>
+<!-- 		<div class="page-right">
+			<a href="javascript:void(0)" class="tr-record">
+				<select class="country-selest">
+
+				</select>
+			</a> -->
+		</div>
+	</div>
+	<div class="container" style="background-color:#f9f9f9">
+		<div class="bank-list">
+		<!-- 	<div class="bank-item">
+				<div class="bank-title">
+					<div class="bank-name">工商银行</div>
+					<div class="default-bank-btn">默认</div>
+				</div>
+				<div class="bank-con">
+					<div class="bank-icon">
+						<img src="images/bank-icon.png">
+					</div>
+					<div class="bank-num">68788888888748547</div>
+					<div class="bank-del">删除</div>
+				</div>
+			</div> -->
+		</div>
+		<a href="me-bank-add.html" class="add-bank-btn">
+			<img src="images/add-bank.png" style="width:2.1rem;">
+			<span class="fs-16" style="color:#5e9ed3;padding-left:1rem;">添加银行卡</span>
+		</a>
+		<div class="tips-box"></div>
+	</div>
+	<script type="text/javascript">
+		$(function(){
+			function getCountry(){
+				 return country;
+			}
+			var country_str=""
+			// country_str+=' <option value ="">请选择</option>';
+			for(var i=0;i<getCountry().length;i++){
+				country_str+=' <option value ="'+getCountry()[i].name+'">'+getCountry()[i].name+'</option>';
+			}
+			$('.country-selest').html(country_str);
+			// var val= $('.country-selest option:selected') .val();//选中的值
+			// console.log(val);
+			var access_token=localStorage.getItem("access_token");
+			if (!access_token) {
+				window.location.href="login.html";
+			}else{
+
+				var url="http://dev.weibanker.cn/chenchangping/atc/api?url=bank_card_lists";
+				var data={
+					access_token:access_token,
+				}
+				var bank_list=""
+				$.post(url,data).success(function(res){
+					if (res.errno=="0") {
+						if (res.data!=null) {
+							for (var i = 0; i < res.data.length; i++) {
+								bank_list += '<div class="bank-item">'
+									+'<div class="bank-title">'
+										+'<div class="bank-name">'+res.data[i].bank_name+'</div>'
+										+'<div class="default-bank-btn '+defaults(res.data[i].default)+'">默认</div>'
+									+'</div>'
+									+'<div class="bank-con">'
+										+'<div class="bank-icon">'
+											+'<img src="images/bank-icon.png">'
+										+'</div>'
+										+'<div class="bank-num">'+res.data[i].bank_card+'</div>'
+										+'<div class="bank-del" bank_id="'+res.data[i].id+'">删除</div>'
+									+'</div>'
+								+'</div>'
+							};
+							$('.bank-list').html(bank_list);
+							$('.bank-del').on('click',function(){
+								var bank_id=$(this).attr('bank_id');
+								delBnak(bank_id);
+							})
+						};
+					}else if (res.errno=="401") {
+						 popup(res.errmsg);
+						 setTimeout(function(){
+						 	window.location.href='login.html';
+						 },1800)
+					}else{
+						//popup(res.errmsg);
+
+					}
+					console.log(res)
+				});
+			}
+			function defaults(num){
+				switch (num) {
+					case '1':
+						return '';
+						break;
+					case '0':
+						return 'none';
+						break;
+				}
+			}
+		function delBnak(bank_id){
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=bank_card_del";
+			var data={
+				access_token:access_token,
+				id:bank_id
+			}
+			$.post(url,data).success(function(res){
+				if (res.errno=="0") {
+					popup('删除成功');
+					setTimeout(function(){
+						window.location.reload()
+					},1500)
+				}else if (res.errno=="401") {
+					 popup(res.errmsg);
+					 setTimeout(function(){
+					 	window.location.href='login.html';
+					 },1800)
+				}else{
+					popup(res.errmsg);
+
+				}
+				console.log(res)
+			});
+		}
+
+
+
+
+		})
+
+
+	</script>
+</body>
+</html>

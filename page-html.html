@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>关于我们</title>
+	<link rel="stylesheet" type="text/css" href="assets/html/css/common.css">
+	<script type="text/javascript" src="assets/html/js/jquery-1.11.3.min.js"></script>
+</head>
+<style type="text/css">
+.page-top {
+    width: 100%;
+    height: 4.583333333333333em;
+    position: fixed;
+    background-color: #4caefb;
+    z-index: 999;
+}
+.back-btn {
+    width: 5em;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.back {
+    position: absolute;
+    top: 0;
+    left: 2em;
+    width: 0.9em;
+    height: 100%;
+    background: url(assets/html/images/back.png) center center no-repeat;
+    background-size: 100% auto;
+}
+.page-title {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    line-height: 3em;
+    font-size: 1.6em;
+    color: #fff;
+}
+.container {
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    min-height: 100vh;
+    color: #000;
+    padding-top: 4.5em;
+}
+</style>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="goback()"><div class="back"></div></div>
+		<div class="page-title"></div>
+	</div>
+	<div class="container">
+		[{$data}]
+	</div>
+</body>
+<script type="text/javascript">
+		var flag = true;
+		function IsPC() {
+			$('.page-title').html(getCookie('title'))
+		    var userAgentInfo = navigator.userAgent;
+		    var Agents = ["Android", "iPhone",
+		                "SymbianOS", "Windows Phone",
+		                "iPad", "iPod"];
+		    for (var v = 0; v < Agents.length; v++) {
+		        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+		            flag = false;
+		            break;
+		        }
+		    }
+		    if(flag){
+		    	$("html").css({'font-size':'12px'})
+		    	$("body").css({'width':'750px', 'margin': 'auto'})
+		    	$("body > div").css({'width':'750px', 'margin': 'auto'})
+		    	$(".container").css({'text-align':'start', 'margin': 'auto','padding':'4.583333333333333em 1em 0'})
+		    }else{
+		    	$("html").css({'font-size':'16px'})
+		    	$(".container").css({'text-align':'start', 'margin': 'auto','padding':'4.583333333333333em 1em 0'})
+		    }
+		}
+		var flags = IsPC();
+		function goback(){
+			if(flag){
+				return
+			}
+			window.history.back(-1)
+		}
+	</script>
+</html>

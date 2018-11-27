@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>关于我们</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="goback()"><div class="back"></div></div>
+		<div class="page-title">关于我们</div>
+	</div>
+	<div class="container">
+		
+	</div>
+	<script type="text/javascript">
+		var flag = true;
+		function IsPC() {
+		    var userAgentInfo = navigator.userAgent;
+		    var Agents = ["Android", "iPhone",
+		                "SymbianOS", "Windows Phone",
+		                "iPad", "iPod"];
+		    for (var v = 0; v < Agents.length; v++) {
+		        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+		            flag = false;
+		            break;
+		        }
+		    }
+		    if(flag){
+		    	$("body").css({'width':'750px', 'margin': 'auto'})
+		    	$("body > div").css({'width':'750px', 'margin': 'auto'})
+		    	$(".container").css({'text-align':'start'})
+		    }
+		}
+		var flags = IsPC();
+		function goback(){
+			if(flag){
+				return
+			}
+			window.location.href='me.html'
+		}
+		var access_token=localStorage.getItem("access_token");
+		if (!access_token) {
+			$(document).click(function() {
+				window.location.href="login.html";
+			});
+		}else{
+			
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>收支明细</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='balance.html'">
+			<div class="back"></div>
+		</div>
+		<div class="page-title">收支明细</div>
+	</div>
+	<div class="container">
+		<div class="details">
+			<div class="errno order_details" style="font-size: 100px;display: none">404</div>
+			<div class="order_details">
+				<div class="details-item">
+					<div class="details-con details-txt">订单号</div>
+					<div class="details-con details-info order_num"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">交易类型</div>
+					<div class="details-con details-info order_type"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">当前状态</div>
+					<div class="details-con details-info order_status"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">交易金额</div>
+					<div class="details-con details-info o-color order_money" style="font-size:1.8rem"></div>
+				</div>
+				<div class="details-item out_people none">
+					<div class="details-con details-txt">收款方</div>
+					<div class="details-con details-info order_people"></div>
+				</div>
+				<div class="details-item in_people none">
+					<div class="details-con details-txt">来自</div>
+					<div class="details-con details-info order_people"></div>
+				</div>
+				<div class="details-item integral_num none">
+					<div class="details-con details-txt">兑换积分</div>
+					<div class="details-con details-info order_people o-color" style="font-size:1.8rem"></div>
+				</div>
+				<div class="details-item integral_people none">
+					<div class="details-con details-txt">来自</div>
+					<div class="details-con details-info order_people"></div>
+				</div>
+				<div class="details-item">
+					<div class="details-con details-txt">交易时间</div>
+					<div class="details-con details-info order_time"></div>
+				</div>
+				<div class="details-item integral_balance">
+					<div class="details-con details-txt">余额</div>
+					<div class="details-con details-info order_balance"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		$(function(){
+			var access_token=localStorage.getItem("access_token");
+			if (!access_token) {
+				window.location.href="login.html";
+			}else{
+				var orderid=getParamString("orderid");
+				var url="http://dev.weibanker.cn/chenchangping/atc/api?url=page_money_info";
+				var data={
+					access_token:access_token,
+					orderid:orderid
+				}
+				$.post(url,data).success(function(res){
+					console.log(res)
+					if (res.errno==="0") {
+						console.log(status(res.data.status));
+						$('.order_details .order_num').html(res.data.orderid);
+						$('.order_details .order_status').html( status(res.data.status));
+						$('.order_details .order_type').html(res.data.title);
+						$('.order_details .order_money').html(isNum(res.data.type)+res.data.money+"元");
+						$('.order_details .order_time').html(res.data.create_time);
+						$('.order_details .order_balance').html(res.data.balance+"元");
+						if (res.data.status!='3') {
+							$('.integral_balance').addClass('none');
+						}
+						if (res.data.title=="转入") {
+							$('.in_people').removeClass('none');
+							$('.order_details>.in_people>.order_people').html(res.data.name);
+						}else if (res.data.title=="转出") {
+							$('.out_people').removeClass('none');
+							$('.order_details>.out_people>.order_people').html(res.data.name);
+						}else if (res.data.title=="购买积分") {
+							$('.integral_people').removeClass('none');
+							$('.order_details>.integral_people>.order_people').html(res.data.title);
+							$('.integral_num').removeClass('none');
+							$('.order_details>.integral_num>.order_people').html(res.data.score+"个");
+						}else if (res.data.title=="购买艾特币") {
+							$('.integral_people').removeClass('none');
+							$('.order_details>.integral_people>.order_people').html(res.data.title);
+						};
+					}else if (res.errno=="401") {
+						 popup(res.errmsg);
+						 setTimeout(function(){
+						 	window.location.href='login.html';
+						 },1800)
+					}else{
+						popup(res.errmsg);
+						$(".errno").show()
+					}
+				});
+			}
+
+		})
+		function isNum(num){
+			switch (num) {
+				case 1:
+					return '+';
+					break;
+				case -1:
+					return '-';
+					break;
+			}
+		}
+		function status(num){
+			switch (num) {
+				case '0':
+					return '审核中';
+					break;
+				case '-1':
+					return '已取消';
+					break;
+				case '3':
+					return '成功';
+					break;
+			}
+		}
+		function isBalanceShow(num){
+			if (num==3) {
+				return '';
+			}else{
+				return 'none';
+			}
+		}
+		function isTipShow(num){
+			if (num==3) {
+				return 'none';
+			}else{
+				return '';
+			}
+		}
+	</script>
+</body>
+</html>

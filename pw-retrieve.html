@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>验证手机号码</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css?v=2.0">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js?v=2.0"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn"><div class="back"></div></div>
+		<div class="page-title"></div>
+	</div>
+	<div class="container login_bg">
+		<div class="login-wrap">
+			<div class="login">
+				<div class="login-item">
+					<input type="tel" name="phone" placeholder="手机号" class="login-input" value="">
+				</div>
+				<div class="login-item">
+					<input type="tel" name="code" placeholder="验证码" class="login-input" value="">
+					<button type="button" class="get-code" id="get-code">获取验证码</button>
+				</div>
+				<button type="submit" class="confirm-btn fs-15">确定</button>
+			</div>
+		</div>
+
+		<div class="tips-box"></div>
+	</div>
+	<script type="text/javascript">
+		var access_token = localStorage.getItem("access_token");
+		var preUrl=document.referrer;
+		console.log(preUrl)
+		localStorage.setItem("preUrl",preUrl);
+		if (document.referrer === '') {
+		    // 没有来源页面信息的时候，改成首页URL地址
+		    $('.back-btn').on('click',function(){
+		    	window.location.reload();
+		    })
+		   //$('.top_back_box>a').attr('onclick','')
+		}else{
+	 		$('.back-btn').on('click',function(){
+		    	window.location.href=preUrl;
+		    })
+			//$('.top_back_box>a').attr('onclick',url)
+		}
+
+		$(function(){
+			//获取验证码
+			if(!access_token) {
+				grtCode('share');
+			} else {
+				grtCode();
+			}
+		})
+		$('.confirm-btn').on('click',function(){
+			var phone = $("input[name='phone']").val();
+			var code = $("input[name='code']").val();
+			if(!code || new RegExp(/^\s*$/).test(code)){
+				popup("验证码不能为空");
+				return false;
+			} 
+			else{
+				mobile_check(phone,code)
+			}
+		})
+
+		var pn = getParamString("pn");
+		var type = getParamString("type");
+		$('.page-title').html(pwtype(pn))
+		console.log(pwLink(type,pn));
+		//手机验证
+		function mobile_check(phone,code){
+			var url="http://dev.weibanker.cn/chenchangping/atc/api?url=mobile_check";
+			var data={
+				mobile:phone,
+				code:code
+			}
+			var type = getParamString("type");
+			$.post(url,data).success(function(res){
+				console.log(res);
+				if (res.errno=="0") {
+					popup('验证成功');
+					var mobile_token = res.data.mobile_token;
+					console.log(mobile_token);
+					localStorage.setItem("mobile_token",mobile_token);
+					window.location.href=pwLink(type,pn);
+				}else{
+					popup(res.errmsg);
+				}
+			});
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/><!-- 是否启用 WebApp 全屏模式 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置状态栏的背景颜色 -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no"/><!-- 禁止数字识自动别为电话号码 --><!-- 不让android识别邮箱 -->
+	<title>添加银行卡</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="js/resize.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="js/bankList.js"></script>
+	<script type="text/javascript" src="js/country.js"></script>
+</head>
+<body>
+	<div class="page-top">
+		<div class="back-btn" onclick="window.location.href='me-bank.html'"><div class="back"></div></div>
+		<div class="page-title">添加银行卡</div>
+<!-- 		<div class="page-right">
+			<a href="javascript:void(0)" class="tr-record">
+				<select class="country-selest">
+
+				</select>
+			</a>
+		</div> -->
+	</div>
+	<div class="container" style="background-color:#f9f9f9">
+		<div class="bank-info">
+			<a href="javascript:void(0)" class="me-list-item">
+				<div class="me-l-left">
+					<span class="me-l-txt"><span class="asterisk">*</span>持卡人姓名:</span>
+				</div>
+				<div class="pw-r-input">
+					<input type="text" name="name" placeholder="请输入名字" class="amount-input" value="">
+				</div>
+			</a>
+			<a href="javascript:void(0)" class="me-list-item">
+				<div class="me-l-left">
+					<span class="me-l-txt"><span class="asterisk">*</span>开户银行:</span>
+				</div>
+				<div class="pw-r-input">
+					<!-- <input type="text" name="" placeholder="请输入名字" class="amount-input" value=""> -->
+					<select class="bank-selest">
+
+					</select>
+				</div>
+			</a>
+			<a href="javascript:void(0)" class="me-list-item">
+				<div class="me-l-left">
+					<span class="me-l-txt"><span class="asterisk">*</span>银行卡卡号:</span>
+				</div>
+				<div class="pw-r-input">
+					<input type="number" name="bank_card" placeholder="请输入银行卡号" class="amount-input" value="">
+				</div>
+			</a>
+			<a href="javascript:void(0)" class="me-list-item">
+				<div class="me-l-left">
+					<span class="me-l-txt">开户支行:</span>
+				</div>
+				<div class="pw-r-input">
+					<input type="text" name="bank_address" placeholder="请输入开户银行的支行" class="amount-input" value="">
+				</div>
+			</a>
+		</div>
+		<div class="default-bank">
+		    <span class="set-default set-default-bank">
+		      <input type="checkbox" id="default" name="user" />
+		      <label for="default">设置默认银行卡</label>
+		    </span>
+		</div>
+		<div class="confirm-btn-mask">
+			<button type="button" class="blue-btn confirm-btn">确认</button>
+		</div>
+		<div class="tips-box"></div>
+	</div>
+	<script type="text/javascript">
+		function getBank(){
+		    return list;
+		}
+		function getCountry(){
+			 return country;
+		}
+		//console.log(getBank())
+		$(function(){
+			var bank_str=""
+			bank_str+=' <option value ="" style="color:#ccc;">请选择开户银行</option>';
+			for(var i=0;i<getBank().length;i++){
+				bank_str+=' <option value ="'+getBank()[i].text+'">'+getBank()[i].text+'</option>';
+			}
+			$('.bank-selest').html(bank_str);
+
+			var country_str=""
+			// country_str+=' <option value ="">请选择</option>';
+			for(var i=0;i<getCountry().length;i++){
+				country_str+=' <option value ="'+getCountry()[i].name+'">'+getCountry()[i].name+'</option>';
+			}
+			$('.country-selest').html(country_str);
+			// var val= $('.country-selest option:selected') .val();//选中的值
+			// console.log(val);
+		})
+
+		$('#default').click(function(){
+			if ($(this).is(':checked')){
+				$(this).siblings('label').addClass('b_color');
+			}else{
+				$(this).siblings('label').removeClass('b_color');
+			}
+		})
+
+
+		var access_token=localStorage.getItem("access_token");
+		if (!access_token) {
+			window.location.href="login.html";
+		}else{
+
+			$('.confirm-btn').on('click',function(){
+				var name = $("input[name='name']").val();
+				var bank_name = $('.bank-selest').val();
+				var bank_card=$("input[name='bank_card']").val();
+				var bank_address=$("input[name='bank_address']").val();
+				var defaults;
+				if ($('#default').is(':checked')) {
+					defaults=1;
+				}else{
+					defaults=0;
+				}
+				//console.log("bank_user"+bank_user+"bank"+bank);
+				if (!name) {
+					popup("请填写姓名");
+					return false;
+				}else if (!bank_name) {
+					popup("请选择银行");
+					return false;
+				}else if (!bank_card) {
+					popup("请输入银行卡号");
+					return false;
+				}else if (!new RegExp(/^([1-9]{1})(\d{14}|\d{18})$/).test(bank_card)) {
+					popup("请输入正确的银行卡号");
+					return false;
+
+				}else{
+					addbank(name,bank_name,bank_card,bank_address,defaults)
+				}
+			})
+
+			function addbank(name,bank_name,bank_card,bank_address,defaults){
+				var url="http://dev.weibanker.cn/chenchangping/atc/api?url=bank_card_add";
+				var data={
+					access_token:access_token,
+					name:name,
+					bank_name:bank_name,
+					bank_card:bank_card,
+					bank_address:bank_address,
+					default:defaults
+				}
+				$.post(url,data).success(function(res){
+					if (res.errno=="0") {
+						popup('添加成功');
+						window.location.href='me-bank.html';
+					}else if (res.errno=="401") {
+						 popup(res.errmsg);
+						 setTimeout(function(){
+						 	window.location.href='login.html';
+						 },1800)
+					}else{
+						popup(res.errmsg);
+
+					}
+					console.log(res)
+				});
+			}
+		}
+
+	</script>
+</body>
+</html>
